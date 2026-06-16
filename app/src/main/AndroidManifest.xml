@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="FitTrack"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.FitTrack">
+
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".SignUpActivity" />
+        <activity android:name=".OnboardingActivity" />
+        <activity android:name=".HealthConditionActivity" />
+        <activity android:name=".DashboardActivity" />
+        <activity android:name=".FitnessScoreActivity" />
+        <activity android:name=".WorkoutHomeActivity" />
+        <activity android:name=".WorkoutDetailActivity" />
+        <activity android:name=".ActiveWorkoutActivity" />
+        <activity android:name=".StressMapperActivity" />
+        <activity android:name=".YogaHomeActivity" />
+        <activity android:name=".MicroWorkoutActivity" />
+        <activity android:name=".DietHomeActivity" />
+        <activity android:name=".RegionalDietActivity" />
+        <activity android:name=".PantryGeneratorActivity" />
+        <activity android:name=".QuickLogActivity" />
+        <activity android:name=".WaterTrackerActivity" />
+        <activity android:name=".GoalPredictorActivity" />
+        <activity android:name=".HabitPredictorActivity" />
+        <activity android:name=".HabitCorrelationActivity" />
+        <activity android:name=".HabitCoachActivity" />
+        <activity android:name=".ProgressActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".ExerciseDetailActivity" />
+
+    </application>
+
+</manifest>

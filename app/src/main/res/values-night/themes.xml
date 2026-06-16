@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FitTrack" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+
+        <!-- Window background color. -->
+        <item name="android:windowBackground">@color/background</item>
+
+        <!-- Surface and background colors -->
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/background</item>
+    </style>
+</resources>
