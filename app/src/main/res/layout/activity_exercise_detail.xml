@@ -61,9 +61,8 @@
                     android:id="@+id/iv_exercise_gif"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="40dp"
-                    android:src="@drawable/ic_workout"
-                    app:tint="#1A56A0" />
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_workout" />
             </androidx.cardview.widget.CardView>
 
             <TextView

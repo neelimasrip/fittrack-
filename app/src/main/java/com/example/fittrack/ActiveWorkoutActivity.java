@@ -17,6 +17,9 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
     private long initialTimeInMillis = 45000;
     private long timeLeftInMillis = 45000;
 
+    private int currentSet = 1;
+    private int totalSets = 3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,9 +35,14 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
         initialTimeInMillis = durationSeconds * 1000L;
         timeLeftInMillis = initialTimeInMillis;
 
+        int reps = getIntent().getIntExtra("reps", 12);
+        totalSets = getIntent().getIntExtra("total_sets", 3);
+        binding.tvReps.setText(String.valueOf(reps));
+
         updateCountDownText();
         startTimer();
         loadImages();
+        updateSetInfo();
 
         binding.btnPause.setOnClickListener(v -> {
             if (isPaused) {
@@ -45,17 +53,40 @@ public class ActiveWorkoutActivity extends AppCompatActivity {
         });
 
         binding.btnComplete.setOnClickListener(v -> {
-            Toast.makeText(this, "Set complete!", Toast.LENGTH_SHORT).show();
-            resetTimer();
+            if (currentSet < totalSets) {
+                currentSet++;
+                updateSetInfo();
+                Toast.makeText(this, "Set " + (currentSet-1) + " complete!", Toast.LENGTH_SHORT).show();
+                resetTimer();
+            } else {
+                pauseTimer();
+                showWorkoutCompleteDialog();
+            }
         });
 
         binding.btnBack.setOnClickListener(v -> showExitDialog());
     }
 
+    private void updateSetInfo() {
+        binding.tvSetInfo.setText("Set " + currentSet + " of " + totalSets);
+        binding.tvSets.setText(String.valueOf(totalSets));
+    }
+
+    private void showWorkoutCompleteDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Workout Complete!")
+                .setMessage("Great job! You've finished all your sets.")
+                .setPositiveButton("Finish", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
+    }
+
     private void loadImages() {
+        String imageUrl = getIntent().getStringExtra("exercise_image");
         // High-quality workout demo
         Glide.with(this)
-            .load("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800")
+            .load(imageUrl != null ? imageUrl : "https://images.unsplash.com/photo-1599058917232-d750c1859d7c?w=800")
+            .placeholder(R.drawable.ic_workout)
             .into(binding.ivWorkoutAnimation);
     }
 

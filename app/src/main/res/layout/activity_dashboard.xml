@@ -23,6 +23,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvGreeting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Good Morning"
@@ -139,6 +140,63 @@
                             android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="My Fitness Stats"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvCurrentWeight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Weight: 0 kg"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/tvBmi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="BMI: 0"
+                        android:textColor="@color/text_primary" />
+
+                    <ProgressBar
+                        android:id="@+id/progressDailyGoal"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="8dp"
+                        android:max="100" />
+
+                    <TextView
+                        android:id="@+id/tvGoalProgress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="0% Goal Completed"
+                        android:textColor="@color/grey_text" />
+
+                </LinearLayout>
+
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -388,6 +446,7 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/tv_today_workout_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Full Body Strength"
@@ -396,6 +455,7 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tv_today_workout_info"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"

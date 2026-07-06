@@ -17,18 +17,53 @@ public class WorkoutDetailActivity extends BaseActivity {
         setContentView(binding.getRoot());
 
         binding.btnBack.setOnClickListener(v -> finish());
-        loadImages();
+        
+        String title = getIntent().getStringExtra("workout_title");
+        String subtitle = getIntent().getStringExtra("workout_subtitle");
+        String desc = getIntent().getStringExtra("workout_description");
+        String exercise = getIntent().getStringExtra("workout_exercise");
+        String imageUrl = getIntent().getStringExtra("workout_image");
+        int reps = getIntent().getIntExtra("workout_reps", 12);
+        int sets = getIntent().getIntExtra("workout_sets", 3);
+
+        if (title != null) {
+            binding.tvDetailTitle.setText(title);
+            binding.tvHeroTitle.setText(title);
+        }
+        if (desc != null) {
+            binding.tvDescription.setText(desc);
+        }
+        if (exercise != null) {
+            binding.tvExercise1.setText(exercise);
+        }
+
+        loadImages(imageUrl);
 
         binding.btnStartWorkout.setOnClickListener(v -> {
             Intent intent = new Intent(this, ActiveWorkoutActivity.class);
-            intent.putExtra("exercise_name", "Full Body Strength");
-            intent.putExtra("duration_seconds", 30);
+            intent.putExtra("exercise_name", title != null ? title : "Full Body Strength");
+            intent.putExtra("exercise_image", imageUrl);
+            intent.putExtra("reps", reps);
+            intent.putExtra("total_sets", sets);
+            
+            int duration = 30; // default
+            if (subtitle != null) {
+                if (subtitle.contains("20 min")) duration = 20 * 60;
+                else if (subtitle.contains("60 min")) duration = 60 * 60;
+                else if (subtitle.contains("30 min")) duration = 30 * 60;
+                else if (subtitle.contains("15 min")) duration = 15 * 60;
+                else if (subtitle.contains("10 min")) duration = 10 * 60;
+                else duration = 30 * 60;
+            }
+            
+            intent.putExtra("duration_seconds", duration);
             startActivity(intent);
         });
 
         binding.row1.setOnClickListener(v -> {
             Intent intent = new Intent(this, ExerciseDetailActivity.class);
-            intent.putExtra("exercise_name", "Dumbbell Bench Press");
+            intent.putExtra("exercise_name", exercise != null ? exercise : "Dumbbell Bench Press");
+            intent.putExtra("exercise_image", imageUrl);
             startActivity(intent);
         });
         
@@ -37,9 +72,10 @@ public class WorkoutDetailActivity extends BaseActivity {
         });
     }
 
-    private void loadImages() {
+    private void loadImages(String imageUrl) {
         Glide.with(this)
-            .load("https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=800") // Heavy lift
+            .load(imageUrl != null ? imageUrl : "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800")
+            .placeholder(R.drawable.ic_workout)
             .into(binding.ivDetailHero);
     }
 }

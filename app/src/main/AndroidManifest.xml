@@ -20,7 +20,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".OnboardingActivity" />
         <activity android:name=".HealthConditionActivity" />

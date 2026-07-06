@@ -16,20 +16,38 @@ public class ExerciseDetailActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         String exerciseName = getIntent().getStringExtra("exercise_name");
+        String imageUrl = getIntent().getStringExtra("exercise_image");
+        
         if (exerciseName != null) {
             binding.tvExerciseTitle.setText(exerciseName);
+            updateContentForExercise(exerciseName);
         }
 
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnGotIt.setOnClickListener(v -> finish());
         
-        loadImages();
+        loadImages(imageUrl);
     }
 
-    private void loadImages() {
+    private void updateContentForExercise(String name) {
+        if (name.contains("Jumping Jacks")) {
+            binding.tvInstructions.setText("1. Stand with feet together and arms at sides.\n2. Jump while spreading legs and clapping hands overhead.\n3. Jump back to starting position.\n4. Repeat in a rhythmic motion.");
+        } else if (name.contains("Burpees")) {
+            binding.tvInstructions.setText("1. Start in a standing position.\n2. Drop into a squat and place hands on the floor.\n3. Kick feet back into a plank, then return to squat.\n4. Jump up explosively with hands overhead.");
+        } else if (name.contains("Sun Salutation")) {
+            binding.tvInstructions.setText("1. Start in Mountain Pose.\n2. Inhale, reach up. Exhale, fold forward.\n3. Move through Plank, Cobra, and Downward Dog.\n4. Return to standing position with focused breathing.");
+        } else if (name.contains("Plank")) {
+            binding.tvInstructions.setText("1. Place forearms on the floor, elbows under shoulders.\n2. Extend legs back, balancing on toes.\n3. Keep body in a straight line from head to heels.\n4. Hold position while engaging core.");
+        } else if (name.contains("Deadlift")) {
+            binding.tvInstructions.setText("1. Stand with feet hip-width apart, barbell over mid-foot.\n2. Bend at hips and knees, grab the bar.\n3. Lift by extending hips and knees, keeping back straight.\n4. Lower the bar under control.");
+        }
+    }
+
+    private void loadImages(String imageUrl) {
         // High-quality workout demonstration image
         Glide.with(this)
-            .load("https://images.unsplash.com/photo-1581009146145-b5ef03a7101b?w=800")
+            .load(imageUrl != null ? imageUrl : "https://images.unsplash.com/photo-1581009146145-b5ef03a7101b?w=800")
+            .placeholder(R.drawable.ic_workout)
             .into(binding.ivExerciseGif);
     }
 }

@@ -52,6 +52,7 @@ public class MicroWorkoutActivity extends BaseActivity {
     private void loadImages() {
         Glide.with(this)
             .load("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400")
+            .placeholder(R.drawable.ic_workout)
             .into(binding.ivMicroPreview);
     }
 
