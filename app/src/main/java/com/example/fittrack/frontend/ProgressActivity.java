@@ -135,7 +135,41 @@ public class ProgressActivity extends BaseActivity {
     }
 
     private void showCalendarHistory() {
-        Toast.makeText(this, "Calendar view coming soon!", Toast.LENGTH_SHORT).show();
+        View view = getLayoutInflater().inflate(R.layout.dialog_calendar, null);
+        android.widget.CalendarView calendarView = view.findViewById(R.id.calendar_view);
+        
+        AlertDialog dialog = new AlertDialog.Builder(this)
+               .setTitle("Progress Calendar")
+               .setView(view)
+               .setPositiveButton("Close", null)
+               .create();
+
+        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.set(year, month, dayOfMonth);
+            String selectedDate = new SimpleDateFormat("MMM dd", Locale.getDefault()).format(cal.getTime());
+            dialog.dismiss();
+            showAddWeightDialogForDate(selectedDate);
+        });
+        
+        dialog.show();
+    }
+
+    private void showAddWeightDialogForDate(String dateStr) {
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_weight, null);
+        EditText etWeight = view.findViewById(R.id.et_weight_input);
+        new AlertDialog.Builder(this)
+               .setTitle("Add Weight (" + dateStr + ")")
+               .setView(view)
+               .setPositiveButton("Save", (dialog, which) -> {
+                   String weightStr = etWeight.getText().toString();
+                   if (!weightStr.isEmpty()) {
+                       preferenceManager.saveWeight(Float.parseFloat(weightStr), dateStr);
+                       loadWeightData();
+                   }
+               })
+               .setNegativeButton("Cancel", null)
+               .show();
     }
 
     private void loadWeightData() {
@@ -239,21 +273,8 @@ public class ProgressActivity extends BaseActivity {
     }
 
     private void showAddWeightDialog() {
-        View view = getLayoutInflater().inflate(R.layout.dialog_add_weight, null);
-        EditText etWeight = view.findViewById(R.id.et_weight_input);
-        new AlertDialog.Builder(this)
-               .setTitle("Add Weight")
-               .setView(view)
-               .setPositiveButton("Save", (dialog, which) -> {
-                   String weightStr = etWeight.getText().toString();
-                   if (!weightStr.isEmpty()) {
-                       String date = new SimpleDateFormat("MMM dd", Locale.getDefault()).format(new Date());
-                       preferenceManager.saveWeight(Float.parseFloat(weightStr), date);
-                       loadWeightData();
-                   }
-               })
-               .setNegativeButton("Cancel", null)
-               .show();
+        String date = new SimpleDateFormat("MMM dd", Locale.getDefault()).format(new Date());
+        showAddWeightDialogForDate(date);
     }
 
     private void loadImages() {
