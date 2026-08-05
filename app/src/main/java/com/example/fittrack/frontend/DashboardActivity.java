@@ -58,7 +58,7 @@ public class DashboardActivity extends BaseActivity {
             startActivity(new Intent(this, ProfileActivity.class)));
 
         binding.btnBell.setOnClickListener(v -> 
-            startActivity(new Intent(this, SettingsActivity.class)));
+            startActivity(new Intent(this, NotificationsActivity.class)));
     }
 
     private void updateFitnessScore(int calories, int water) {

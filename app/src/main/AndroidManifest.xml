@@ -52,6 +52,7 @@
         <activity android:name=".frontend.SettingsActivity" />
         <activity android:name=".frontend.EditProfileActivity" />
         <activity android:name=".frontend.ExerciseDetailActivity" />
+        <activity android:name=".frontend.NotificationsActivity" />
 
         <receiver android:name=".backend.NotificationReceiver" android:exported="false" />
         <receiver android:name=".backend.BootReceiver" android:exported="true">

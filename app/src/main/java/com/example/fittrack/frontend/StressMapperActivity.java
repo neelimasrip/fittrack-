@@ -34,7 +34,7 @@ public class StressMapperActivity extends BaseActivity {
         loadImages();
 
         binding.btnBack.setOnClickListener(v -> finish());
-        binding.btnBell.setOnClickListener(v -> Toast.makeText(this, "No new notifications", Toast.LENGTH_SHORT).show());
+        binding.btnBell.setOnClickListener(v -> startActivity(new Intent(this, NotificationsActivity.class)));
 
         binding.seekStress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override

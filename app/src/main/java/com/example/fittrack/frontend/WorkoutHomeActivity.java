@@ -105,7 +105,7 @@ public class WorkoutHomeActivity extends BaseActivity {
 
         binding.btnFilter.setOnClickListener(this::showFilterMenu);
         binding.btnMenu.setOnClickListener(v -> Toast.makeText(this, "Menu drawer opening...", Toast.LENGTH_SHORT).show());
-        binding.btnBell.setOnClickListener(v -> Toast.makeText(this, "No new notifications", Toast.LENGTH_SHORT).show());
+        binding.btnBell.setOnClickListener(v -> startActivity(new Intent(this, NotificationsActivity.class)));
         
         applyFilters();
     }
