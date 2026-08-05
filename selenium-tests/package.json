@@ -1,0 +1,14 @@
+{
+  "name": "fittrack-web-selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium WebDriver E2E Test Suite for FitTrack React Web App",
+  "main": "tests/login-tests.js",
+  "scripts": {
+    "test": "node tests/login-tests.js",
+    "report": "python generate_web_report.py"
+  },
+  "dependencies": {
+    "chromedriver": "^122.0.0",
+    "selenium-webdriver": "^4.46.0"
+  }
+}
