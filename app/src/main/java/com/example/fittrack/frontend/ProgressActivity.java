@@ -23,6 +23,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.fittrack.databinding.ActivityProgressBinding;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -158,15 +159,59 @@ public class ProgressActivity extends BaseActivity {
     private void updateRecentEntries() {
         binding.containerRecentEntries.removeAllViews();
         String history = preferenceManager.getWeightHistory();
+        
+        TextView[] dateLabels = {
+            binding.tvChartDate0, binding.tvChartDate1,
+            binding.tvChartDate2, binding.tvChartDate3,
+            binding.tvChartDate4
+        };
+        for (TextView tv : dateLabels) {
+            tv.setText("");
+        }
+
         if (history.isEmpty()) {
             binding.tvNoEntries.setVisibility(View.VISIBLE);
+            binding.chartView.setDataPoints(new ArrayList<>());
             return;
         }
         binding.tvNoEntries.setVisibility(View.GONE);
         String[] entries = history.split("\\|");
-        for (int i = 0; i < Math.min(entries.length, 5); i++) {
+        
+        List<Float> chartPoints = new ArrayList<>();
+        List<String> chartDates = new ArrayList<>();
+        
+        int count = Math.min(entries.length, 5);
+        for (int i = 0; i < entries.length; i++) {
             String[] parts = entries[i].split(":");
-            if (parts.length == 2) addEntryToView(parts[0], parts[1] + " kg", i);
+            if (parts.length == 2) {
+                if (i < 5) { // Add to recent entries list view
+                    addEntryToView(parts[0], parts[1] + " kg", i);
+                }
+                
+                if (chartPoints.size() < 5) {
+                    try {
+                        chartPoints.add(Float.parseFloat(parts[1]));
+                        chartDates.add(parts[0]);
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        }
+        
+        // History is newest first, we want oldest first for the chart
+        Collections.reverse(chartPoints);
+        Collections.reverse(chartDates);
+        
+        binding.chartView.setDataPoints(chartPoints);
+        
+        // Update date labels
+        for (int i = 0; i < chartDates.size(); i++) {
+            if (i < dateLabels.length) {
+                if (i == chartDates.size() - 1) {
+                    dateLabels[i].setText("Today");
+                } else {
+                    dateLabels[i].setText(chartDates.get(i));
+                }
+            }
         }
     }
 
