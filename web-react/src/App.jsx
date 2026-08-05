@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Zap, Home, Dumbbell, Utensils, Droplet, ChartLine, User, 
-  Bell, Settings, Plus, Play, Pause, RotateCcw, Check, Earth, Carrot, Bolt, LogOut, X, Award, Target, Sparkles, AlertCircle
+  Bell, Settings, Plus, Play, Pause, RotateCcw, Check, Earth, Carrot, Bolt, LogOut, X, Award, Target, Sparkles, AlertCircle, Smile, Activity, Brain
 } from 'lucide-react';
 import { 
   auth, db, 
@@ -53,6 +53,10 @@ export default function App() {
   // Quick Log State
   const [logMealName, setLogMealName] = useState('');
   const [logMealKcal, setLogMealKcal] = useState('');
+
+  // Stress & Mood State
+  const [stressLevel, setStressLevel] = useState(() => parseInt(localStorage.getItem('userStress')) || 4);
+  const [userMood, setUserMood] = useState(() => localStorage.getItem('userMood') || 'Okay');
 
   // Weight History
   const [weightHistory, setWeightHistory] = useState([
@@ -686,6 +690,21 @@ export default function App() {
               </div>
             </div>
 
+            <div className="glass-card" style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div className="brand-icon" style={{ width: '48px', height: '48px' }}><Brain size={24} /></div>
+                <div>
+                  <h3 style={{ fontSize: '18px', margin: 0 }}>AI Stress &amp; Mood Mapper</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: '4px 0 0 0' }}>
+                    Current Stress Level: <strong style={{ color: stressLevel >= 7 ? '#ef4444' : stressLevel >= 4 ? '#f59e0b' : '#10b981' }}>{stressLevel}/10</strong> ({userMood})
+                  </p>
+                </div>
+              </div>
+              <button className="btn-primary" onClick={() => setActiveModal('stress_mapper')}>
+                <Activity size={16} /> Open Stress Mapper
+              </button>
+            </div>
+
             <div className="hero-card" style={{ marginBottom: '24px' }}>
               <div className="hero-content">
                 <span style={{ background: 'rgba(16,185,129,0.3)', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, color: '#10B981' }}>
@@ -1192,6 +1211,81 @@ export default function App() {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>Rest & Mind Balance:</span> <strong>7 / 15 pts</strong>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL 9: STRESS MAPPER */}
+            {activeModal === 'stress_mapper' && (
+              <div>
+                <h3>AI Stress &amp; Mood Mapper</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '16px' }}>
+                  Track your mental wellness and get personalized Pranayama &amp; Breathwork routines.
+                </p>
+
+                <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                  <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800" alt="Mindfulness" style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '14px', marginBottom: '16px' }} />
+
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>How are you feeling today?</div>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
+                    {['Terrible', 'Bad', 'Okay', 'Good', 'Great'].map((m, i) => {
+                      const icons = ['😫', '😟', '😐', '🙂', '😁'];
+                      const isSelected = userMood === m;
+                      return (
+                        <button 
+                          key={m}
+                          type="button"
+                          onClick={() => { setUserMood(m); localStorage.setItem('userMood', m); }}
+                          style={{ padding: '8px 12px', borderRadius: '10px', background: isSelected ? 'var(--primary)' : 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        >
+                          <span>{icons[i]}</span> <span>{m}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 600 }}>Stress Level:</span>
+                    <span style={{ fontSize: '18px', fontWeight: 800, color: stressLevel >= 7 ? '#ef4444' : stressLevel >= 4 ? '#f59e0b' : '#10b981' }}>{stressLevel} / 10</span>
+                  </div>
+
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="10" 
+                    value={stressLevel} 
+                    onChange={e => {
+                      const val = parseInt(e.target.value);
+                      setStressLevel(val);
+                      localStorage.setItem('userStress', val);
+                    }}
+                    style={{ width: '100%', accentColor: 'var(--primary)', marginBottom: '16px' }}
+                  />
+
+                  <div style={{ padding: '14px', borderRadius: '12px', background: 'var(--bg-surface)', border: '1px solid var(--border)', textAlign: 'left', marginBottom: '20px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Brain size={16} /> Smart Recommendation
+                    </div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                      {stressLevel >= 7 
+                        ? "High stress detected. Recommended: 15 min Anulom Vilom & Deep Breathing to lower cortisol."
+                        : stressLevel >= 4 
+                        ? "Moderate stress level. Recommended: 10 min Nadi Shodhana & Gentle Yoga flow."
+                        : "Low stress! Great energy state for Kapalbhati & Surya Namaskar Flow."}
+                    </div>
+                  </div>
+
+                  <button 
+                    className="btn-primary" 
+                    onClick={() => {
+                      setActiveModal(null);
+                      setCurrentView('workout');
+                      setActiveFilter('Yoga');
+                    }}
+                    style={{ width: '100%', justifyContent: 'center', padding: '14px' }}
+                  >
+                    <Activity size={18} /> Start Tailored Yoga &amp; Pranayama Session
+                  </button>
                 </div>
               </div>
             )}
