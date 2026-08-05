@@ -28,6 +28,12 @@ public class FitnessScoreActivity extends BaseActivity {
         binding.ivScoreDiet.setOnClickListener(v -> startActivity(new android.content.Intent(this, DietHomeActivity.class)));
         binding.ivScoreSleep.setOnClickListener(v -> startActivity(new android.content.Intent(this, WaterTrackerActivity.class)));
         binding.ivScoreMind.setOnClickListener(v -> startActivity(new android.content.Intent(this, StressMapperActivity.class)));
+        
+        binding.btnAiStar.setOnClickListener(v -> {
+            android.widget.Toast.makeText(this, "Generating new AI insights...", android.widget.Toast.LENGTH_SHORT).show();
+            v.animate().rotationBy(360f).setDuration(500).start();
+        });
+
         loadImages();
     }
 
