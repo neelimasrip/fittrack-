@@ -37,7 +37,7 @@ public class DietHomeActivity extends BaseActivity {
     }
 
     private void checkDailyReset() {
-        if (preferenceManager.shouldResetMeals()) {
+        if (preferenceManager.shouldResetMeals() || preferenceManager.getMealName("Breakfast").isEmpty()) {
             DietData.DayPlan today = DietData.getPlanOfTheDay();
             preferenceManager.saveMealPlan(
                 today.breakfast.name, today.breakfast.kcal, today.breakfast.imageUrl,
@@ -51,6 +51,7 @@ public class DietHomeActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        checkDailyReset();
         loadMealData();
         loadMealImages();
         updateCalorieProgress();
