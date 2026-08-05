@@ -34,6 +34,11 @@ public class PreferenceManager {
     private static final String KEY_TOTAL_CALORIES = "totalCalories";
     private static final String KEY_WATER_GLASSES = "waterGlasses";
 
+    // Remember Me
+    private static final String KEY_SAVED_EMAIL = "savedEmail";
+    private static final String KEY_SAVED_PASSWORD = "savedPassword";
+    private static final String KEY_REMEMBER_ME = "rememberMe";
+
     // Diet data
     private static final String KEY_MEAL_RESET_DATE = "mealResetDate";
     private static final String KEY_MEAL_BREAKFAST_NAME = "mealBreakfastName";
@@ -188,6 +193,33 @@ public class PreferenceManager {
     public void saveProfileImage(String uri) {
         prefs.edit().putString(KEY_PROFILE_IMAGE, uri).apply();
     }
+
+    // --- Remember Me ---
+    public void saveLoginCredentials(String email, String password, boolean rememberMe) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(KEY_REMEMBER_ME, rememberMe);
+        if (rememberMe) {
+            editor.putString(KEY_SAVED_EMAIL, email);
+            editor.putString(KEY_SAVED_PASSWORD, password);
+        } else {
+            editor.remove(KEY_SAVED_EMAIL);
+            editor.remove(KEY_SAVED_PASSWORD);
+        }
+        editor.apply();
+    }
+
+    public boolean isRememberMe() {
+        return prefs.getBoolean(KEY_REMEMBER_ME, false);
+    }
+
+    public String getSavedEmail() {
+        return prefs.getString(KEY_SAVED_EMAIL, "");
+    }
+
+    public String getSavedPassword() {
+        return prefs.getString(KEY_SAVED_PASSWORD, "");
+    }
+    // -------------------
 
     public String getProfileImage() {
         return prefs.getString(KEY_PROFILE_IMAGE, "");

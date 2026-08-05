@@ -56,6 +56,13 @@ public class LoginActivity extends BaseActivity {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
+        // Auto-fill Remember Me
+        if (preferenceManager.isRememberMe()) {
+            binding.etEmail.setText(preferenceManager.getSavedEmail());
+            binding.etPassword.setText(preferenceManager.getSavedPassword());
+            binding.cbRememberMe.setChecked(true);
+        }
+
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -94,6 +101,8 @@ public class LoginActivity extends BaseActivity {
         binding.btnLogin.setOnClickListener(v -> {
             String email = binding.etEmail.getText().toString().trim();
             String password = binding.etPassword.getText().toString().trim();
+            
+            binding.layoutPasswordContainer.setBackgroundResource(R.drawable.bg_input_outlined);
 
             if (TextUtils.isEmpty(email)) {
                 binding.etEmail.setError("Email is required");
@@ -101,14 +110,17 @@ public class LoginActivity extends BaseActivity {
             }
             if (TextUtils.isEmpty(password)) {
                 binding.etPassword.setError("Password is required");
+                binding.layoutPasswordContainer.setBackgroundResource(R.drawable.bg_input_error);
                 return;
             }
 
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            preferenceManager.saveLoginCredentials(email, password, binding.cbRememberMe.isChecked());
                             fetchUserDetails(mAuth.getCurrentUser().getUid());
                         } else {
+                            binding.layoutPasswordContainer.setBackgroundResource(R.drawable.bg_input_error);
                             Toast.makeText(LoginActivity.this, task.getException() != null ? task.getException().getMessage() : "Login Failed", Toast.LENGTH_LONG).show();
                         }
                     });

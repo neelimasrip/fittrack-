@@ -21,6 +21,7 @@ import com.example.fittrack.databinding.ActivityEditProfileBinding;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,20 +39,22 @@ public class EditProfileActivity extends AppCompatActivity {
                     new ActivityResultContracts.GetContent(),
                     uri -> {
                         if (uri != null) {
-                            String internalPath = saveImageToInternalStorage(uri);
-
-                            if (internalPath != null) {
-                                selectedImageUri = Uri.parse(internalPath);
-
-                                binding.ivProfilePic.setImageURI(selectedImageUri);
-
-                                preferenceManager.saveProfileImage(internalPath);
-
-                                Toast.makeText(
-                                        this,
-                                        "Saved: " + internalPath,
-                                        Toast.LENGTH_LONG
-                                ).show();
+                            binding.ivProfilePic.setImageURI(uri);
+                            Toast.makeText(this, "Uploading image...", Toast.LENGTH_SHORT).show();
+                            
+                            if (mAuth.getCurrentUser() != null) {
+                                String uid = mAuth.getCurrentUser().getUid();
+                                FirebaseStorage.getInstance().getReference().child("profile_images/" + uid + ".jpg")
+                                        .putFile(uri)
+                                        .addOnSuccessListener(taskSnapshot -> {
+                                            taskSnapshot.getStorage().getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                                                String downloadUrl = downloadUri.toString();
+                                                selectedImageUri = Uri.parse(downloadUrl);
+                                                preferenceManager.saveProfileImage(downloadUrl);
+                                                Toast.makeText(EditProfileActivity.this, "Profile picture uploaded!", Toast.LENGTH_SHORT).show();
+                                            });
+                                        })
+                                        .addOnFailureListener(e -> Toast.makeText(EditProfileActivity.this, "Upload failed", Toast.LENGTH_SHORT).show());
                             }
                         }
                     });
@@ -190,7 +193,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     .into(binding.ivProfilePic);
         } else {
             Glide.with(this)
-                    .load("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200")
+                    .load("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200")
                     .placeholder(R.drawable.ic_person)
                     .circleCrop()
                     .into(binding.ivProfilePic);
