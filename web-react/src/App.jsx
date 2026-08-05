@@ -1068,24 +1068,31 @@ export default function App() {
                   setActiveModal(null); 
                 }} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
                   
-                  <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-                    <img src={userAvatar} alt="Profile" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', marginBottom: '8px' }} />
-                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200')} style={{ padding: '4px 8px', fontSize: '11px' }}>Preset 1</button>
-                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')} style={{ padding: '4px 8px', fontSize: '11px' }}>Preset 2</button>
-                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200')} style={{ padding: '4px 8px', fontSize: '11px' }}>Preset 3</button>
+                  <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                    <img src={userAvatar} alt="Profile" style={{ width: '84px', height: '84px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', marginBottom: '12px', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }} />
+                    
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginBottom: '10px' }}>
+                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200')} style={{ padding: '6px 12px', fontSize: '11px', background: userAvatar.includes('1535713875002') ? 'var(--primary)' : 'var(--bg-surface)', border: '1px solid var(--border)' }}>Avatar 1</button>
+                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')} style={{ padding: '6px 12px', fontSize: '11px', background: userAvatar.includes('1534528741775') ? 'var(--primary)' : 'var(--bg-surface)', border: '1px solid var(--border)' }}>Avatar 2</button>
+                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200')} style={{ padding: '6px 12px', fontSize: '11px', background: userAvatar.includes('1570295999919') ? 'var(--primary)' : 'var(--bg-surface)', border: '1px solid var(--border)' }}>Avatar 3</button>
                     </div>
-                  </div>
 
-                  <div>
-                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Profile Photo URL</label>
-                    <input 
-                      type="text" 
-                      value={userAvatar} 
-                      onChange={e => setUserAvatar(e.target.value)} 
-                      placeholder="Image URL (https://...)"
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
-                    />
+                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', padding: '6px 14px', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      📷 Upload Local Photo
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => setUserAvatar(reader.result);
+                            reader.readAsDataURL(file);
+                          }
+                        }} 
+                        style={{ display: 'none' }} 
+                      />
+                    </label>
                   </div>
 
                   <div>
