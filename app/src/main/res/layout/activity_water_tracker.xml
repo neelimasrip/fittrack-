@@ -113,10 +113,11 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_remaining_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Drink 3 more glasses to reach your goal"
+                android:text="Drink 8 more glasses to reach your goal"
                 android:textColor="#888888"
                 android:textSize="14sp" />
 

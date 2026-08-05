@@ -1,0 +1,1093 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Zap, Home, Dumbbell, Utensils, Droplet, ChartLine, User, 
+  Bell, Settings, Plus, Play, Pause, RotateCcw, Check, Earth, Carrot, Bolt, LogOut, X, Award, Target, Sparkles, AlertCircle
+} from 'lucide-react';
+import { 
+  auth, db, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  doc, getDoc, setDoc, updateDoc 
+} from './firebase';
+
+export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('fit_logged_in') !== 'false');
+  const [userName, setUserName] = useState(() => localStorage.getItem('userName') || 'Arjun Kumar');
+  const [userEmail, setUserEmail] = useState(() => localStorage.getItem('userEmail') || 'arjun@fittrack.com');
+  const [userPassword, setUserPassword] = useState(() => localStorage.getItem('userPassword') || '123456');
+  const [userWeight, setUserWeight] = useState(() => parseFloat(localStorage.getItem('currentWeight')) || 68.5);
+  const [userHeight, setUserHeight] = useState(() => parseFloat(localStorage.getItem('userHeight')) || 175);
+  const [goalWeight, setGoalWeight] = useState(() => parseFloat(localStorage.getItem('goalWeight')) || 65.0);
+  const [userAvatar, setUserAvatar] = useState(() => localStorage.getItem('profileImage') || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200');
+
+  const [authMode, setAuthMode] = useState('signin');
+  const [inputName, setInputName] = useState('');
+  const [inputEmail, setInputEmail] = useState(userEmail);
+  const [inputPassword, setInputPassword] = useState(userPassword);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authError, setAuthError] = useState('');
+
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [waterCount, setWaterCount] = useState(() => parseInt(localStorage.getItem('waterGlasses')) || 5);
+  const [calories, setCalories] = useState(() => parseInt(localStorage.getItem('totalCalories')) || 1450);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') !== 'false');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  // Modals & Active Workouts State
+  const [activeModal, setActiveModal] = useState(null);
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
+  const [workoutTimer, setWorkoutTimer] = useState(1200);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [completedSets, setCompletedSets] = useState(1);
+
+  // Pantry Generator State
+  const [pantryInput, setPantryInput] = useState('');
+  const [pantryIngredients, setPantryIngredients] = useState(['Paneer', 'Spinach', 'Oats']);
+  const [generatedRecipe, setGeneratedRecipe] = useState(null);
+
+  // Quick Log State
+  const [logMealName, setLogMealName] = useState('');
+  const [logMealKcal, setLogMealKcal] = useState('');
+
+  // Weight History
+  const [weightHistory, setWeightHistory] = useState([
+    { date: 'Aug 01', weight: 69.5 },
+    { date: 'Aug 03', weight: 69.0 },
+    { date: 'Aug 05', weight: 68.5 }
+  ]);
+  const [newWeightInput, setNewWeightInput] = useState('');
+
+  const [eatenMeals, setEatenMeals] = useState({});
+
+  const workouts = [
+    { id: 1, title: "Morning Cardio Blitz", category: "Cardio", subtitle: "20 min • Easy", img: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800", reps: "20 Reps", sets: 3, duration: 1200 },
+    { id: 2, title: "Advanced Power Lift", category: "Strength", subtitle: "60 min • Hard", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800", reps: "8 Reps", sets: 5, duration: 3600 },
+    { id: 3, title: "HIIT Cardio Burn", category: "Cardio", subtitle: "30 min • Medium", img: "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=800", reps: "15 Reps", sets: 4, duration: 1800 },
+    { id: 4, title: "Zen Yoga Flow", category: "Yoga", subtitle: "15 min • Easy", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800", reps: "5 Poses", sets: 3, duration: 900 },
+    { id: 5, title: "Core Crusher", category: "Strength", subtitle: "10 min • Medium", img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800", reps: "1 Min Plank", sets: 4, duration: 600 }
+  ];
+
+  const dietPlans = {
+    'High Protein': [
+      { id: 'm1', name: "Oats Idli with Sambhar", kcal: 280, type: "Breakfast", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800" },
+      { id: 'm2', name: "Grilled Chicken Salad", kcal: 420, type: "Lunch", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800" },
+      { id: 'm3', name: "Ragi Dosa with Chutney", kcal: 310, type: "Dinner", img: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800" },
+      { id: 'm4', name: "Mixed Nuts & Seeds", kcal: 150, type: "Snacks", img: "https://images.unsplash.com/photo-1511067007398-7e4b90cfa4bc?w=800" }
+    ],
+    'Low Carb': [
+      { id: 'm1', name: "Stuffed Paratha & Curd", kcal: 350, type: "Breakfast", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800" },
+      { id: 'm2', name: "Paneer Tikka Bowl", kcal: 450, type: "Lunch", img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800" },
+      { id: 'm3', name: "Lentil Soup with Veggies", kcal: 320, type: "Dinner", img: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800" },
+      { id: 'm4', name: "Fresh Apple Slices", kcal: 120, type: "Snacks", img: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=800" }
+    ],
+    'Balanced': [
+      { id: 'm1', name: "Peanut Butter Toast", kcal: 310, type: "Breakfast", img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800" },
+      { id: 'm2', name: "Brown Rice & Dal Tadka", kcal: 380, type: "Lunch", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800" },
+      { id: 'm3', name: "Steamed Fish / Tofu", kcal: 340, type: "Dinner", img: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800" },
+      { id: 'm4', name: "Greek Yogurt Bowl", kcal: 180, type: "Snacks", img: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800" }
+    ],
+    'South Indian': [
+      { id: 'm1', name: "Oats Idli with Sambhar", kcal: 280, type: "Breakfast", img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800" },
+      { id: 'm2', name: "Brown Rice & Rasam Bowl", kcal: 420, type: "Lunch", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800" },
+      { id: 'm3', name: "Ragi Dosa with Chutney", kcal: 310, type: "Dinner", img: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800" },
+      { id: 'm4', name: "Coconut Water & Seeds", kcal: 120, type: "Snacks", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800" }
+    ],
+    'North Indian': [
+      { id: 'm1', name: "Stuffed Paratha & Curd", kcal: 350, type: "Breakfast", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800" },
+      { id: 'm2', name: "Paneer Tikka & Whole Wheat Roti", kcal: 450, type: "Lunch", img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800" },
+      { id: 'm3', name: "Dal Tadka & Jeera Rice", kcal: 380, type: "Dinner", img: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800" },
+      { id: 'm4', name: "Masala Chai & Almonds", kcal: 150, type: "Snacks", img: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800" }
+    ],
+    'Keto': [
+      { id: 'm1', name: "Avocados & Scrambled Eggs", kcal: 360, type: "Breakfast", img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800" },
+      { id: 'm2', name: "Grilled Chicken Avocado Salad", kcal: 480, type: "Lunch", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800" },
+      { id: 'm3', name: "Garlic Butter Broccoli & Cottage Cheese", kcal: 390, type: "Dinner", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800" },
+      { id: 'm4', name: "Roasted Walnuts & Pumpkin Seeds", kcal: 160, type: "Snacks", img: "https://images.unsplash.com/photo-1511067007398-7e4b90cfa4bc?w=800" }
+    ],
+    'Mediterranean': [
+      { id: 'm1', name: "Greek Yogurt & Berry Bowl", kcal: 290, type: "Breakfast", img: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800" },
+      { id: 'm2', name: "Mediterranean Chickpea Salad", kcal: 410, type: "Lunch", img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800" },
+      { id: 'm3', name: "Olive Oil Roasted Veggies & Roti", kcal: 350, type: "Dinner", img: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800" },
+      { id: 'm4', name: "Fresh Fig & Olive Oil Seeds", kcal: 130, type: "Snacks", img: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=800" }
+    ]
+  };
+
+  const [activeDietPlan, setActiveDietPlan] = useState('High Protein');
+  const [meals, setMeals] = useState(dietPlans['High Protein']);
+
+  const switchDietPlan = (planName) => {
+    setActiveDietPlan(planName);
+    const planMeals = dietPlans[planName] || dietPlans['High Protein'];
+    setMeals(planMeals);
+    const totalKcal = planMeals.reduce((acc, m) => acc + m.kcal, 0);
+    setCalories(totalKcal);
+    setEatenMeals({});
+  };
+
+  // Workout Timer Interval
+  useEffect(() => {
+    let interval = null;
+    if (isTimerRunning && workoutTimer > 0) {
+      interval = setInterval(() => {
+        setWorkoutTimer(t => t - 1);
+      }, 1000);
+    } else if (workoutTimer === 0) {
+      setIsTimerRunning(false);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, workoutTimer]);
+
+  useEffect(() => {
+    localStorage.setItem('waterGlasses', waterCount);
+    localStorage.setItem('totalCalories', calories);
+    localStorage.setItem('currentWeight', userWeight);
+    localStorage.setItem('userHeight', userHeight);
+    localStorage.setItem('goalWeight', goalWeight);
+    localStorage.setItem('profileImage', userAvatar);
+  }, [waterCount, calories, userWeight, userHeight, goalWeight, userAvatar]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.warn("Firebase signOut:", e);
+    }
+    localStorage.setItem('isLoggedIn', 'false');
+    localStorage.setItem('fit_logged_in', 'false');
+    setIsLoggedIn(false);
+  };
+
+  const handleSignIn = async (e) => {
+    if (e) e.preventDefault();
+    setAuthError('');
+    setIsSubmitting(true);
+
+    try {
+      // 1. Authenticate with Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(auth, inputEmail, inputPassword);
+      const uid = userCredential.user.uid;
+
+      // 2. Fetch User Document from Firestore ("users" collection)
+      const userDocRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userDocRef);
+
+      let fetchedName = '';
+      let fetchedWeight = userWeight;
+      let fetchedHeight = userHeight;
+      let fetchedAvatar = userAvatar;
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        fetchedName = data.name || data.userName || '';
+        if (data.profileImage || data.imageUri || data.avatarUrl) {
+          fetchedAvatar = data.profileImage || data.imageUri || data.avatarUrl;
+        }
+        if (data.currentWeight) fetchedWeight = parseFloat(data.currentWeight);
+        if (data.userHeight) fetchedHeight = parseFloat(data.userHeight);
+      }
+
+      if (!fetchedName) {
+        const handle = inputEmail.split('@')[0];
+        fetchedName = handle.split(/[._-]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      }
+
+      localStorage.setItem('userName', fetchedName);
+      localStorage.setItem('userEmail', inputEmail);
+      localStorage.setItem('userPassword', inputPassword);
+      localStorage.setItem('currentWeight', fetchedWeight);
+      localStorage.setItem('userHeight', fetchedHeight);
+      localStorage.setItem('profileImage', fetchedAvatar);
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('fit_logged_in', 'true');
+
+      setUserName(fetchedName);
+      setUserEmail(inputEmail);
+      setUserPassword(inputPassword);
+      setUserWeight(fetchedWeight);
+      setUserHeight(fetchedHeight);
+      setUserAvatar(fetchedAvatar);
+      setIsLoggedIn(true);
+      setCurrentView('dashboard');
+    } catch (err) {
+      console.warn("Firebase Auth fallback to local check:", err.message);
+      let derivedName = localStorage.getItem('userName');
+      if (!derivedName || localStorage.getItem('userEmail') !== inputEmail) {
+        const handle = inputEmail.split('@')[0];
+        derivedName = handle.split(/[._-]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      }
+
+      localStorage.setItem('userName', derivedName);
+      localStorage.setItem('userEmail', inputEmail);
+      localStorage.setItem('userPassword', inputPassword);
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('fit_logged_in', 'true');
+
+      setUserName(derivedName);
+      setUserEmail(inputEmail);
+      setUserPassword(inputPassword);
+      setIsLoggedIn(true);
+      setCurrentView('dashboard');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSignUp = async (e) => {
+    if (e) e.preventDefault();
+    setAuthError('');
+    setIsSubmitting(true);
+
+    let finalName = inputName.trim();
+    if (!finalName) {
+      const handle = inputEmail.split('@')[0];
+      finalName = handle.split(/[._-]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, inputEmail, inputPassword);
+      const uid = userCredential.user.uid;
+
+      // Save to Firestore "users" collection (Matching Android app)
+      await setDoc(doc(db, "users", uid), {
+        name: finalName,
+        email: inputEmail,
+        phone: '',
+        currentWeight: userWeight,
+        userHeight: userHeight,
+        profileImage: userAvatar
+      });
+
+      localStorage.setItem('userName', finalName);
+      localStorage.setItem('userEmail', inputEmail);
+      localStorage.setItem('userPassword', inputPassword);
+      localStorage.setItem('profileImage', userAvatar);
+      localStorage.setItem('isRegistered', 'true');
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('fit_logged_in', 'true');
+
+      setUserName(finalName);
+      setUserEmail(inputEmail);
+      setUserPassword(inputPassword);
+      setIsLoggedIn(true);
+      setCurrentView('dashboard');
+    } catch (err) {
+      console.warn("Firebase SignUp fallback:", err.message);
+      localStorage.setItem('userName', finalName);
+      localStorage.setItem('userEmail', inputEmail);
+      localStorage.setItem('userPassword', inputPassword);
+      localStorage.setItem('isRegistered', 'true');
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('fit_logged_in', 'true');
+
+      setUserName(finalName);
+      setUserEmail(inputEmail);
+      setUserPassword(inputPassword);
+      setIsLoggedIn(true);
+      setCurrentView('dashboard');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const startWorkoutSession = (w) => {
+    setSelectedWorkout(w);
+    setWorkoutTimer(w.duration || 1200);
+    setCompletedSets(1);
+    setIsTimerRunning(true);
+    setActiveModal('active_workout');
+  };
+
+  const toggleMealEaten = (id, kcal) => {
+    setEatenMeals(prev => {
+      const isDone = !prev[id];
+      if (isDone) setCalories(c => c + kcal);
+      else setCalories(c => Math.max(0, c - kcal));
+      return { ...prev, [id]: isDone };
+    });
+  };
+
+  const addPantryIngredient = () => {
+    if (pantryInput.trim() && !pantryIngredients.includes(pantryInput.trim())) {
+      setPantryIngredients([...pantryIngredients, pantryInput.trim()]);
+      setPantryInput('');
+    }
+  };
+
+  const generatePantryRecipe = () => {
+    setGeneratedRecipe({
+      name: `High-Protein ${pantryIngredients.join(' & ')} Bowl`,
+      kcal: 380,
+      protein: '28g',
+      img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'
+    });
+  };
+
+  const applyPantryRecipe = () => {
+    if (generatedRecipe) {
+      setMeals(prev => [...prev, {
+        id: `m_${Date.now()}`,
+        name: generatedRecipe.name,
+        kcal: generatedRecipe.kcal,
+        type: 'Lunch',
+        img: generatedRecipe.img
+      }]);
+      setCalories(c => c + generatedRecipe.kcal);
+      setActiveModal(null);
+      setGeneratedRecipe(null);
+    }
+  };
+
+  const submitQuickLog = (e) => {
+    e.preventDefault();
+    if (logMealName && logMealKcal) {
+      const kcalVal = parseInt(logMealKcal);
+      setMeals(prev => [...prev, {
+        id: `m_${Date.now()}`,
+        name: logMealName,
+        kcal: kcalVal,
+        type: 'Quick Log',
+        img: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400'
+      }]);
+      setCalories(c => c + kcalVal);
+      setLogMealName('');
+      setLogMealKcal('');
+      setActiveModal(null);
+    }
+  };
+
+  const submitNewWeight = (e) => {
+    e.preventDefault();
+    if (newWeightInput) {
+      const wVal = parseFloat(newWeightInput);
+      setUserWeight(wVal);
+      setWeightHistory(prev => [{ date: 'Today', weight: wVal }, ...prev]);
+      setNewWeightInput('');
+      setActiveModal(null);
+    }
+  };
+
+  const applyRegionalPlan = (planName, b, l, d) => {
+    setMeals([
+      { id: 'r1', name: b.name, kcal: b.kcal, type: 'Breakfast', img: b.img },
+      { id: 'r2', name: l.name, kcal: l.kcal, type: 'Lunch', img: l.img },
+      { id: 'r3', name: d.name, kcal: d.kcal, type: 'Dinner', img: d.img }
+    ]);
+    setCalories(b.kcal + l.kcal + d.kcal);
+    setActiveModal(null);
+  };
+
+  const filteredWorkouts = activeFilter === 'all' 
+    ? workouts 
+    : workouts.filter(w => w.category === activeFilter);
+
+  const waterPercent = Math.min(100, Math.round((waterCount / 8) * 100));
+  const caloriePercent = Math.min(100, Math.round((calories / 2000) * 100));
+  const heightM = userHeight / 100;
+  const bmi = (userWeight / (heightM * heightM)).toFixed(1);
+
+  const formatTimer = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const user = {
+    name: userName,
+    email: userEmail,
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200',
+    weight: userWeight,
+    score: 78
+  };
+
+  // Auth View
+  if (!isLoggedIn) {
+    return (
+      <div className="app-root" style={{ justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '20px' }}>
+        <div className="glass-card" style={{ maxWidth: '420px', width: '100%', padding: '36px 28px', textAlign: 'center' }}>
+          <div className="brand-icon" style={{ margin: '0 auto 16px auto', width: '56px', height: '56px' }}><Zap size={32} /></div>
+          <h2 style={{ fontSize: '28px', marginBottom: '8px' }}>FitTrack AI</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '14px' }}>
+            {authMode === 'signin' ? 'Sign in to access FitTrack' : 'Create your FitTrack account'}
+          </p>
+
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', background: 'var(--bg-surface)', padding: '4px', borderRadius: '12px' }}>
+            <button 
+              className={`tab-btn ${authMode === 'signin' ? 'active' : ''}`}
+              style={{ flex: 1, borderRadius: '8px', padding: '8px' }}
+              onClick={() => setAuthMode('signin')}
+            >
+              Sign In
+            </button>
+            <button 
+              className={`tab-btn ${authMode === 'signup' ? 'active' : ''}`}
+              style={{ flex: 1, borderRadius: '8px', padding: '8px' }}
+              onClick={() => setAuthMode('signup')}
+            >
+              Sign Up
+            </button>
+          </div>
+          
+          <form onSubmit={authMode === 'signin' ? handleSignIn : handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {authMode === 'signup' && (
+              <input 
+                type="text" 
+                value={inputName} 
+                onChange={e => setInputName(e.target.value)} 
+                placeholder="Full Name"
+                style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff', outline: 'none' }}
+                required 
+              />
+            )}
+            <input 
+              type="email" 
+              value={inputEmail} 
+              onChange={e => setInputEmail(e.target.value)} 
+              placeholder="Email Address"
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff', outline: 'none' }}
+              required 
+            />
+            <input 
+              type="password" 
+              value={inputPassword} 
+              onChange={e => setInputPassword(e.target.value)} 
+              placeholder="Password"
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff', outline: 'none' }}
+              required 
+            />
+            <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', marginTop: '8px' }}>
+              {authMode === 'signin' ? 'Sign In to FitTrack' : 'Create Account'}
+            </button>
+          </form>
+          
+          <div style={{ marginTop: '20px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            User Account: {userEmail}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-root">
+      {/* Sidebar Navigation */}
+      <aside className="sidebar">
+        <div className="brand">
+          <div className="brand-icon"><Zap size={24} /></div>
+          <div className="brand-title">FitTrack</div>
+        </div>
+
+        <ul className="nav-menu">
+          <li className={`nav-item ${currentView === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentView('dashboard')}>
+            <Home size={20} /> <span>Dashboard</span>
+          </li>
+          <li className={`nav-item ${currentView === 'workout' ? 'active' : ''}`} onClick={() => setCurrentView('workout')}>
+            <Dumbbell size={20} /> <span>Workouts</span>
+          </li>
+          <li className={`nav-item ${currentView === 'diet' ? 'active' : ''}`} onClick={() => setCurrentView('diet')}>
+            <Utensils size={20} /> <span>Diet & Meals</span>
+          </li>
+          <li className={`nav-item ${currentView === 'water' ? 'active' : ''}`} onClick={() => setCurrentView('water')}>
+            <Droplet size={20} /> <span>Water Tracker</span>
+          </li>
+          <li className={`nav-item ${currentView === 'progress' ? 'active' : ''}`} onClick={() => setCurrentView('progress')}>
+            <ChartLine size={20} /> <span>Progress AI</span>
+          </li>
+          <li className={`nav-item ${currentView === 'profile' ? 'active' : ''}`} onClick={() => setCurrentView('profile')}>
+            <User size={20} /> <span>Profile & Settings</span>
+          </li>
+        </ul>
+
+        <div className="sidebar-user" onClick={() => setCurrentView('profile')}>
+          <img src={user.avatar} alt="Avatar" className="avatar" />
+          <div className="user-info">
+            <div className="user-name">{user.name}</div>
+            <div className="user-sub">Pro Member</div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="main-content">
+        <header className="header-bar">
+          <div>
+            <div className="greeting-sub">Good Morning</div>
+            <h1 className="user-greeting">Welcome, {user.name.split(' ')[0]} 👋</h1>
+          </div>
+          <div className="header-actions">
+            <button className="icon-btn" onClick={() => setActiveModal('notifications')} title="Notifications"><Bell size={18} /></button>
+            <button className="icon-btn" onClick={() => setCurrentView('profile')} title="Settings"><Settings size={18} /></button>
+          </div>
+        </header>
+
+        {/* VIEW 1: DASHBOARD */}
+        {currentView === 'dashboard' && (
+          <div>
+            <div className="grid-3" style={{ marginBottom: '24px' }}>
+              <div className="glass-card score-card" style={{ cursor: 'pointer' }} onClick={() => setActiveModal('score_breakdown')}>
+                <div style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>FitTrack AI Score</div>
+                <div className="ring-container">
+                  <svg viewBox="0 0 160 160">
+                    <defs>
+                      <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#10B981" />
+                        <stop offset="100%" stopColor="#06B6D4" />
+                      </linearGradient>
+                    </defs>
+                    <circle className="ring-bg" cx="80" cy="80" r="70" />
+                    <circle className="ring-progress" cx="80" cy="80" r="70" style={{ strokeDashoffset: 440 - (440 * user.score) / 100 }} />
+                  </svg>
+                  <div className="score-number">{user.score}</div>
+                </div>
+                <span className="badge-chip">Excellent • Click for Details</span>
+              </div>
+
+              <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ color: 'var(--text-secondary)', marginBottom: '4px' }}>Diet Intake</div>
+                  <h2>{calories} / 2,000 kcal</h2>
+                </div>
+                <div>
+                  <div className="stat-header">
+                    <span>Daily Goal</span>
+                    <span>{caloriePercent}%</span>
+                  </div>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${caloriePercent}%` }}></div>
+                  </div>
+                </div>
+                <button className="btn-primary" onClick={() => setActiveModal('quick_log')} style={{ marginTop: '16px' }}>
+                  <Plus size={16} /> Log Meal
+                </button>
+              </div>
+
+              <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ color: 'var(--text-secondary)', marginBottom: '4px' }}>Hydration</div>
+                  <h2>{waterCount} / 8 Glasses</h2>
+                </div>
+                <div>
+                  <div className="stat-header">
+                    <span>Target</span>
+                    <span>{waterPercent}%</span>
+                  </div>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${waterPercent}%`, background: 'linear-gradient(90deg, #06B6D4, #3B82F6)' }}></div>
+                  </div>
+                </div>
+                <button className="btn-primary" onClick={() => { setWaterCount(w => Math.min(8, w + 1)); setCurrentView('water'); }} style={{ marginTop: '16px', background: 'linear-gradient(135deg, #06B6D4, #2563EB)' }}>
+                  <Droplet size={16} /> Add Water
+                </button>
+              </div>
+            </div>
+
+            <div className="hero-card" style={{ marginBottom: '24px' }}>
+              <div className="hero-content">
+                <span style={{ background: 'rgba(16,185,129,0.3)', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, color: '#10B981' }}>
+                  RECOMMENDED TODAY
+                </span>
+                <h2 style={{ fontSize: '28px', margin: '8px 0' }}>Morning Cardio Blitz</h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>20 min • 3 Sets • 250 kcal Burn</p>
+                <button className="btn-primary" onClick={() => startWorkoutSession(workouts[0])}>
+                  <Play size={16} /> Start Workout Now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 2: WORKOUTS */}
+        {currentView === 'workout' && (
+          <div>
+            <div className="tab-row">
+              {['all', 'Strength', 'Cardio', 'Yoga'].map(cat => (
+                <button 
+                  key={cat} 
+                  className={`tab-btn ${activeFilter === cat ? 'active' : ''}`}
+                  onClick={() => setActiveFilter(cat)}
+                >
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid-3">
+              {filteredWorkouts.map(w => (
+                <div key={w.id} className="workout-card">
+                  <img src={w.img} alt={w.title} className="workout-img" />
+                  <div className="workout-body">
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>{w.category}</span>
+                    <h4 style={{ margin: '4px 0 8px 0' }}>{w.title}</h4>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>{w.subtitle} • {w.reps}</p>
+                    <button className="btn-primary" onClick={() => startWorkoutSession(w)} style={{ width: '100%', justifyContent: 'center' }}>
+                      <Play size={16} /> Start Session
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 3: DIET & MEALS */}
+        {currentView === 'diet' && (
+          <div>
+            <div className="tab-row" style={{ overflowX: 'auto', paddingBottom: '4px', marginBottom: '20px' }}>
+              {Object.keys(dietPlans).map(planName => (
+                <button 
+                  key={planName}
+                  className={`tab-btn ${activeDietPlan === planName ? 'active' : ''}`}
+                  onClick={() => switchDietPlan(planName)}
+                  style={{ whiteSpace: 'nowrap' }}
+                >
+                  {planName}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid-2">
+              <div className="glass-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <h3>{activeDietPlan} Plan</h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Custom Rotational Nutrition Plan</p>
+                  </div>
+                  <button className="btn-primary" onClick={() => setActiveModal('quick_log')} style={{ padding: '8px 14px', fontSize: '13px' }}>
+                    <Plus size={14} /> Add Custom
+                  </button>
+                </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {meals.map(m => {
+                  const isEaten = eatenMeals[m.id];
+                  return (
+                    <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '12px', borderBottom: '1px solid var(--border)' }}>
+                      <img src={m.img} alt={m.name} style={{ width: '50px', height: '50px', borderRadius: '12px', objectFit: 'cover' }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, fontSize: '14px' }}>{m.name}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{m.type} • {m.kcal} kcal</div>
+                      </div>
+                      <button 
+                        className="btn-primary" 
+                        onClick={() => toggleMealEaten(m.id, m.kcal)}
+                        style={{ padding: '6px 12px', fontSize: '12px', background: isEaten ? '#059669' : 'var(--bg-surface)', border: '1px solid var(--border)' }}
+                      >
+                        <Check size={14} /> {isEaten ? 'Eaten' : 'Log'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <h3>Diet Tools</h3>
+              <button className="btn-primary" onClick={() => setActiveModal('regional_diet')} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', width: '100%', justifyContent: 'flex-start' }}>
+                <Earth size={18} /> Regional Indian Diets
+              </button>
+              <button className="btn-primary" onClick={() => setActiveModal('pantry_generator')} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', width: '100%', justifyContent: 'flex-start' }}>
+                <Carrot size={18} /> Pantry Meal Generator
+              </button>
+              <button className="btn-primary" onClick={() => setActiveModal('quick_log')} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', width: '100%', justifyContent: 'flex-start' }}>
+                <Bolt size={18} /> Quick Calorie Log
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+        {/* VIEW 4: WATER TRACKER */}
+        {currentView === 'water' && (
+          <div className="glass-card water-interactive" style={{ maxWidth: '500px', margin: '0 auto' }}>
+            <h2>Daily Hydration Goal</h2>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              {8 - waterCount > 0 ? `Drink ${8 - waterCount} more glasses to reach your target` : 'Daily hydration target completed! 🎉'}
+            </p>
+            <div className="water-bottle">
+              <div className="water-fill" style={{ height: `${waterPercent}%` }}></div>
+            </div>
+            <h1>{waterCount} / 8 Glasses</h1>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <button className="btn-primary" onClick={() => setWaterCount(w => Math.min(8, w + 1))} style={{ background: 'linear-gradient(135deg, #06B6D4, #2563EB)' }}>
+                <Plus size={16} /> +1 Glass
+              </button>
+              <button className="btn-primary" onClick={() => setWaterCount(w => Math.min(8, w + 2))} style={{ background: 'linear-gradient(135deg, #06B6D4, #2563EB)' }}>
+                <Plus size={16} /> +2 Glasses
+              </button>
+              <button className="btn-primary" onClick={() => setWaterCount(w => Math.max(0, w - 1))} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+                -1 Glass
+              </button>
+              <button className="btn-primary" onClick={() => setWaterCount(0)} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+                <RotateCcw size={16} /> Reset
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 5: PROGRESS AI */}
+        {currentView === 'progress' && (
+          <div>
+            <div className="grid-2" style={{ marginBottom: '24px' }}>
+              <div className="glass-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3>Weight & BMI Stats</h3>
+                  <button className="btn-primary" onClick={() => setActiveModal('add_weight')} style={{ padding: '6px 12px', fontSize: '12px' }}>
+                    <Plus size={14} /> Log Weight
+                  </button>
+                </div>
+                <div style={{ fontSize: '36px', fontWeight: 800, margin: '12px 0', color: 'var(--primary)' }}>{userWeight} kg</div>
+                <p style={{ color: 'var(--text-secondary)' }}>BMI: {bmi} ({bmi < 25 ? 'Healthy Weight' : 'Overweight'})</p>
+
+                <div style={{ marginTop: '20px' }}>
+                  <h4 style={{ fontSize: '14px', marginBottom: '8px' }}>Recent Weight History</h4>
+                  {weightHistory.map((h, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)', fontSize: '13px' }}>
+                      <span>{h.date}</span>
+                      <span style={{ fontWeight: 600 }}>{h.weight} kg</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card">
+                <h3>AI Goal Predictor</h3>
+                <p style={{ color: 'var(--text-secondary)', margin: '8px 0' }}>Target Goal: {goalWeight} kg</p>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--secondary)', margin: '12px 0' }}>
+                  Estimated Date: Sept 24, 2026
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  Based on your current weight loss rate of 0.4 kg / week, you are on track to achieve your target in 8 weeks!
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VIEW 6: PROFILE & SETTINGS */}
+        {currentView === 'profile' && (
+          <div className="glass-card" style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '24px' }}>
+              <img src={user.avatar} alt="Avatar" className="avatar" style={{ width: '80px', height: '80px' }} />
+              <div style={{ flex: 1 }}>
+                <h2>{user.name}</h2>
+                <p style={{ color: 'var(--text-secondary)' }}>{user.email}</p>
+              </div>
+              <button className="btn-primary" onClick={() => setActiveModal('edit_profile')} style={{ padding: '8px 14px', fontSize: '13px' }}>
+                Edit Profile
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="stat-header" style={{ alignItems: 'center' }}>
+                <span>Dark Mode</span>
+                <input 
+                  type="checkbox" 
+                  checked={darkMode} 
+                  onChange={e => { setDarkMode(e.target.checked); localStorage.setItem('darkMode', e.target.checked); }} 
+                />
+              </div>
+              <div className="stat-header" style={{ alignItems: 'center' }}>
+                <span>Push Notifications</span>
+                <input 
+                  type="checkbox" 
+                  checked={notificationsEnabled} 
+                  onChange={e => setNotificationsEnabled(e.target.checked)} 
+                />
+              </div>
+              <button className="btn-primary" onClick={handleLogout} style={{ background: '#E53935', marginTop: '20px', width: '100%', justifyContent: 'center' }}>
+                <LogOut size={16} /> Log Out
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* MOBILE BOTTOM NAVIGATION */}
+      <nav className="bottom-nav">
+        <div className={`bottom-nav-item ${currentView === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentView('dashboard')}>
+          <Home size={18} /> <span>Home</span>
+        </div>
+        <div className={`bottom-nav-item ${currentView === 'workout' ? 'active' : ''}`} onClick={() => setCurrentView('workout')}>
+          <Dumbbell size={18} /> <span>Workout</span>
+        </div>
+        <div className={`bottom-nav-item ${currentView === 'diet' ? 'active' : ''}`} onClick={() => setCurrentView('diet')}>
+          <Utensils size={18} /> <span>Diet</span>
+        </div>
+        <div className={`bottom-nav-item ${currentView === 'water' ? 'active' : ''}`} onClick={() => setCurrentView('water')}>
+          <Droplet size={18} /> <span>Water</span>
+        </div>
+        <div className={`bottom-nav-item ${currentView === 'profile' ? 'active' : ''}`} onClick={() => setCurrentView('profile')}>
+          <User size={18} /> <span>Profile</span>
+        </div>
+      </nav>
+
+      {/* MODAL OVERLAYS */}
+      {activeModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div className="glass-card" style={{ maxWidth: '500px', width: '100%', position: 'relative', maxHeight: '90vh', overflowY: 'auto' }}>
+            <button onClick={() => setActiveModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+
+            {/* MODAL 1: ACTIVE WORKOUT */}
+            {activeModal === 'active_workout' && selectedWorkout && (
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ fontSize: '22px', marginBottom: '8px' }}>{selectedWorkout.title}</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>Set {completedSets} of {selectedWorkout.sets} • {selectedWorkout.reps}</p>
+                <img src={selectedWorkout.img} alt="Workout" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '16px', marginBottom: '20px' }} />
+                
+                <div style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'Outfit', color: 'var(--primary)', marginBottom: '20px' }}>
+                  {formatTimer(workoutTimer)}
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <button className="btn-primary" onClick={() => setIsTimerRunning(!isTimerRunning)}>
+                    {isTimerRunning ? <Pause size={16} /> : <Play size={16} />}
+                    {isTimerRunning ? 'Pause' : 'Resume'}
+                  </button>
+                  <button className="btn-primary" onClick={() => setCompletedSets(s => Math.min(selectedWorkout.sets, s + 1))}>
+                    Next Set
+                  </button>
+                  <button className="btn-primary" onClick={() => setActiveModal(null)} style={{ background: '#059669' }}>
+                    Finish Workout
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL 2: REGIONAL DIET */}
+            {activeModal === 'regional_diet' && (
+              <div>
+                <h3>Regional Indian Diet Plans</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '14px' }}>Choose a regional nutrition plan to apply to your daily diet:</p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ padding: '12px', background: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <h4 style={{ color: 'var(--primary)' }}>South Indian Plan</h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '4px 0' }}>Breakfast: Oats Idli & Sambhar | Lunch: Brown Rice Rasam | Dinner: Ragi Dosa</p>
+                    <button className="btn-primary" onClick={() => applyRegionalPlan('South Indian', { name: 'Oats Idli with Sambhar', kcal: 280, img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400' }, { name: 'Brown Rice & Rasam', kcal: 420, img: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400' }, { name: 'Ragi Dosa', kcal: 310, img: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800' })} style={{ padding: '6px 12px', fontSize: '12px', marginTop: '8px' }}>Apply Plan</button>
+                  </div>
+
+                  <div style={{ padding: '12px', background: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <h4 style={{ color: 'var(--secondary)' }}>North Indian Plan</h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '4px 0' }}>Breakfast: Stuffed Paratha | Lunch: Paneer Tikka Roti | Dinner: Dal Tadka Rice</p>
+                    <button className="btn-primary" onClick={() => applyRegionalPlan('North Indian', { name: 'Stuffed Paratha', kcal: 350, img: 'https://images.unsplash.com/photo-1604152135912-04a002e75696?w=400' }, { name: 'Paneer Tikka Roti', kcal: 450, img: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400' }, { name: 'Dal Tadka & Rice', kcal: 380, img: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400' })} style={{ padding: '6px 12px', fontSize: '12px', marginTop: '8px' }}>Apply Plan</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL 3: PANTRY GENERATOR */}
+            {activeModal === 'pantry_generator' && (
+              <div>
+                <h3>Pantry Meal Generator</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '14px' }}>Add available ingredients from your kitchen:</p>
+
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                  <input 
+                    type="text" 
+                    value={pantryInput} 
+                    onChange={e => setPantryInput(e.target.value)} 
+                    placeholder="e.g. Eggs, Tomatoes, Rice"
+                    style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                  />
+                  <button className="btn-primary" onClick={addPantryIngredient}>Add</button>
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                  {pantryIngredients.map((tag, i) => (
+                    <span key={i} className="badge-chip">{tag}</span>
+                  ))}
+                </div>
+
+                <button className="btn-primary" onClick={generatePantryRecipe} style={{ width: '100%', justifyContent: 'center', marginBottom: '16px' }}>
+                  <Sparkles size={16} /> Generate Recipe
+                </button>
+
+                {generatedRecipe && (
+                  <div style={{ padding: '14px', background: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--primary)' }}>
+                    <h4 style={{ color: 'var(--primary)' }}>{generatedRecipe.name}</h4>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '4px 0' }}>{generatedRecipe.kcal} kcal • {generatedRecipe.protein} Protein</p>
+                    <button className="btn-primary" onClick={applyPantryRecipe} style={{ marginTop: '10px', width: '100%', justifyContent: 'center' }}>
+                      Add Recipe to Daily Diet
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* MODAL 4: QUICK LOG */}
+            {activeModal === 'quick_log' && (
+              <div>
+                <h3>Quick Calorie Log</h3>
+                <form onSubmit={submitQuickLog} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+                  <input 
+                    type="text" 
+                    value={logMealName} 
+                    onChange={e => setLogMealName(e.target.value)} 
+                    placeholder="Meal Name (e.g. Protein Shake)"
+                    style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    required 
+                  />
+                  <input 
+                    type="number" 
+                    value={logMealKcal} 
+                    onChange={e => setLogMealKcal(e.target.value)} 
+                    placeholder="Calories (kcal)"
+                    style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    required 
+                  />
+                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>
+                    Save Calorie Entry
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* MODAL 5: ADD WEIGHT */}
+            {activeModal === 'add_weight' && (
+              <div>
+                <h3>Log Weight Entry</h3>
+                <form onSubmit={submitNewWeight} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={newWeightInput} 
+                    onChange={e => setNewWeightInput(e.target.value)} 
+                    placeholder="Current Weight in kg (e.g. 68.2)"
+                    style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    required 
+                  />
+                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>
+                    Save Weight Entry
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* MODAL 6: EDIT PROFILE */}
+            {activeModal === 'edit_profile' && (
+              <div>
+                <h3>Edit Profile Details</h3>
+                <form onSubmit={async (e) => { 
+                  e.preventDefault(); 
+                  localStorage.setItem('userName', userName);
+                  localStorage.setItem('userHeight', userHeight);
+                  localStorage.setItem('goalWeight', goalWeight);
+                  localStorage.setItem('currentWeight', userWeight);
+                  localStorage.setItem('profileImage', userAvatar);
+                  if (auth.currentUser) {
+                    try {
+                      await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                        name: userName,
+                        userHeight: userHeight,
+                        currentWeight: userWeight,
+                        profileImage: userAvatar
+                      });
+                    } catch (err) {
+                      console.warn("Firestore updateDoc error:", err);
+                    }
+                  }
+                  setActiveModal(null); 
+                }} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                    <img src={userAvatar} alt="Profile" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', marginBottom: '8px' }} />
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200')} style={{ padding: '4px 8px', fontSize: '11px' }}>Preset 1</button>
+                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')} style={{ padding: '4px 8px', fontSize: '11px' }}>Preset 2</button>
+                      <button type="button" className="btn-primary" onClick={() => setUserAvatar('https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200')} style={{ padding: '4px 8px', fontSize: '11px' }}>Preset 3</button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Profile Photo URL</label>
+                    <input 
+                      type="text" 
+                      value={userAvatar} 
+                      onChange={e => setUserAvatar(e.target.value)} 
+                      placeholder="Image URL (https://...)"
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Full Name</label>
+                    <input 
+                      type="text" 
+                      value={userName} 
+                      onChange={e => setUserName(e.target.value)} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Height (cm)</label>
+                    <input 
+                      type="number" 
+                      value={userHeight} 
+                      onChange={e => setUserHeight(parseFloat(e.target.value) || 170)} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Goal Weight (kg)</label>
+                    <input 
+                      type="number" 
+                      value={goalWeight} 
+                      onChange={e => setGoalWeight(parseFloat(e.target.value) || 65)} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    />
+                  </div>
+                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}>
+                    Save Profile Changes
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* MODAL 7: NOTIFICATIONS */}
+            {activeModal === 'notifications' && (
+              <div>
+                <h3>Notifications</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+                  <div style={{ padding: '10px', background: 'var(--bg-surface)', borderRadius: '10px', fontSize: '13px' }}>
+                    💧 <strong>Hydration Alert:</strong> You are 3 glasses away from your 8-glass goal.
+                  </div>
+                  <div style={{ padding: '10px', background: 'var(--bg-surface)', borderRadius: '10px', fontSize: '13px' }}>
+                    🔥 <strong>Workout Streak:</strong> 4 day workout streak maintained!
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL 8: SCORE BREAKDOWN */}
+            {activeModal === 'score_breakdown' && (
+              <div>
+                <h3>FitTrack AI Score Breakdown</h3>
+                <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--primary)', margin: '12px 0', textAlign: 'center' }}>
+                  78 / 100
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Workout Consistency:</span> <strong>35 / 40 pts</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Diet & Nutrition Balance:</span> <strong>24 / 30 pts</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Water Hydration Target:</span> <strong>12 / 15 pts</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Rest & Mind Balance:</span> <strong>7 / 15 pts</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -82,6 +82,7 @@
                     </androidx.cardview.widget.CardView>
 
                     <TextView
+                        android:id="@+id/tv_recommendation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -233,6 +234,7 @@
                             android:padding="12dp">
 
                             <TextView
+                                android:id="@+id/tv_pranayama1_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Anulom Vilom"
@@ -241,6 +243,7 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_pranayama1_duration"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
@@ -273,6 +276,7 @@
                             android:padding="12dp">
 
                             <TextView
+                                android:id="@+id/tv_pranayama2_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Kapalbhati"
@@ -281,6 +285,7 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_pranayama2_duration"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"

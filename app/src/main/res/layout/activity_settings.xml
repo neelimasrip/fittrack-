@@ -190,6 +190,21 @@
                         <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_chevron_right" app:tint="@color/text_secondary"/>
                     </LinearLayout>
 
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginHorizontal="16dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/row_logout"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingHorizontal="16dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Log Out" android:textColor="#E53935" android:textSize="14sp" android:textStyle="bold"/>
+                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_chevron_right" app:tint="#E53935"/>
+                    </LinearLayout>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

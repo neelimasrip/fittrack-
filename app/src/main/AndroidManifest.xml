@@ -12,7 +12,7 @@
         android:theme="@style/Theme.FitTrack">
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".frontend.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,33 +21,33 @@
         </activity>
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".frontend.LoginActivity"
             android:exported="true" />
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".OnboardingActivity" />
-        <activity android:name=".HealthConditionActivity" />
-        <activity android:name=".DashboardActivity" />
-        <activity android:name=".FitnessScoreActivity" />
-        <activity android:name=".WorkoutHomeActivity" />
-        <activity android:name=".WorkoutDetailActivity" />
-        <activity android:name=".ActiveWorkoutActivity" />
-        <activity android:name=".StressMapperActivity" />
-        <activity android:name=".YogaHomeActivity" />
-        <activity android:name=".MicroWorkoutActivity" />
-        <activity android:name=".DietHomeActivity" />
-        <activity android:name=".RegionalDietActivity" />
-        <activity android:name=".PantryGeneratorActivity" />
-        <activity android:name=".QuickLogActivity" />
-        <activity android:name=".WaterTrackerActivity" />
-        <activity android:name=".GoalPredictorActivity" />
-        <activity android:name=".HabitPredictorActivity" />
-        <activity android:name=".HabitCorrelationActivity" />
-        <activity android:name=".HabitCoachActivity" />
-        <activity android:name=".ProgressActivity" />
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".EditProfileActivity" />
-        <activity android:name=".ExerciseDetailActivity" />
+        <activity android:name=".frontend.SignUpActivity" />
+        <activity android:name=".frontend.OnboardingActivity" />
+        <activity android:name=".frontend.HealthConditionActivity" />
+        <activity android:name=".frontend.DashboardActivity" />
+        <activity android:name=".frontend.FitnessScoreActivity" />
+        <activity android:name=".frontend.WorkoutHomeActivity" />
+        <activity android:name=".frontend.WorkoutDetailActivity" />
+        <activity android:name=".frontend.ActiveWorkoutActivity" />
+        <activity android:name=".frontend.StressMapperActivity" />
+        <activity android:name=".frontend.YogaHomeActivity" />
+        <activity android:name=".frontend.MicroWorkoutActivity" />
+        <activity android:name=".frontend.DietHomeActivity" />
+        <activity android:name=".frontend.RegionalDietActivity" />
+        <activity android:name=".frontend.PantryGeneratorActivity" />
+        <activity android:name=".frontend.QuickLogActivity" />
+        <activity android:name=".frontend.WaterTrackerActivity" />
+        <activity android:name=".frontend.GoalPredictorActivity" />
+        <activity android:name=".frontend.HabitPredictorActivity" />
+        <activity android:name=".frontend.HabitCorrelationActivity" />
+        <activity android:name=".frontend.HabitCoachActivity" />
+        <activity android:name=".frontend.ProgressActivity" />
+        <activity android:name=".frontend.ProfileActivity" />
+        <activity android:name=".frontend.SettingsActivity" />
+        <activity android:name=".frontend.EditProfileActivity" />
+        <activity android:name=".frontend.ExerciseDetailActivity" />
 
     </application>
 

@@ -519,6 +519,7 @@
                     android:layout_marginBottom="12dp"/>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/card_workouts_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
@@ -542,9 +543,10 @@
                             android:layout_marginStart="16dp"
                             android:orientation="vertical">
                             <TextView
+                                android:id="@+id/tv_total_workouts_count"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="12 Workouts"
+                                android:text="0 Workouts"
                                 android:textStyle="bold"
                                 android:textSize="16sp"/>
                             <TextView
@@ -558,6 +560,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/card_calories_burned"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="12dp"
@@ -580,9 +583,10 @@
                             android:layout_marginStart="16dp"
                             android:orientation="vertical">
                             <TextView
+                                android:id="@+id/tv_total_calories_burned"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="4,500 kcal"
+                                android:text="0 kcal"
                                 android:textStyle="bold"
                                 android:textSize="16sp"/>
                             <TextView
@@ -614,8 +618,10 @@
                     android:layout_marginBottom="12dp"/>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/card_weekly_report"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="0dp">
                     <LinearLayout
@@ -644,6 +650,79 @@
                             style="@style/Widget.MaterialComponents.Button.TextButton"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI Smart Insights"
+                    android:textColor="#1F3864"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"/>
+
+                <LinearLayout
+                    android:id="@+id/row_goal_predictor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_pill_transparent"
+                    android:backgroundTint="#EEF4FB"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_ai_score"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Goal Completion Predictor" android:textColor="#1F3864" android:textStyle="bold"/>
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_chevron_right"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/row_habit_predictor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_pill_transparent"
+                    android:backgroundTint="#EEF4FB"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_clock"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Behavioral Habit Predictor" android:textColor="#1F3864" android:textStyle="bold"/>
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_chevron_right"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/row_habit_coach"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_pill_transparent"
+                    android:backgroundTint="#EEF4FB"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_person"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="AI Lifestyle Coach" android:textColor="#1F3864" android:textStyle="bold"/>
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_chevron_right"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/row_habit_correlation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_pill_transparent"
+                    android:backgroundTint="#EEF4FB"
+                    android:padding="16dp"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_progress_white" app:tint="@color/primary"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Weekly Correlation AI" android:textColor="#1F3864" android:textStyle="bold"/>
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_chevron_right"/>
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
