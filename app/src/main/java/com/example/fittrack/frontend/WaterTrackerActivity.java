@@ -43,6 +43,15 @@ public class WaterTrackerActivity extends BaseActivity {
                 Toast.makeText(this, "Daily goal reached! Great job!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        binding.btnResetWater.setOnClickListener(v -> {
+            if (glasses > 0) {
+                glasses = 0;
+                preferenceManager.setWaterGlasses(glasses);
+                updateWaterUI();
+                Toast.makeText(this, "Water intake reset for today", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateWaterUI() {

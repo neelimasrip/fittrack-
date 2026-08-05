@@ -133,6 +133,19 @@
                 app:backgroundTint="#1A56A0"
                 app:cornerRadius="12dp" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_reset_water"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:text="Reset Intake"
+                android:textColor="#1F3864"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:strokeColor="#1F3864"
+                app:cornerRadius="12dp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
