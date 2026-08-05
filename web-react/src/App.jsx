@@ -452,8 +452,30 @@ export default function App() {
     setActiveModal(null);
   };
 
+  const highStressYoga = [
+    { id: 101, title: "Bhramari (Humming Bee Breath)", category: "Yoga", subtitle: "15 min • High Stress Calming", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800", reps: "10 Rounds", sets: 3, duration: 900, benefits: "Instantly calms agitated mind & lowers anxiety.", steps: ["Sit with eyes closed.", "Place index fingers on ear tragus.", "Inhale deeply.", "Exhale making humming bee sound ('Mmmmm')."] },
+    { id: 102, title: "Sheetali (Cooling Breath)", category: "Yoga", subtitle: "10 min • Heat & Stress Release", img: "https://images.unsplash.com/photo-1552196563-55cd4e45efb3?w=800", reps: "15 Rounds", sets: 3, duration: 600, benefits: "Cools body temperature & calms heart rate.", steps: ["Roll tongue into a tube.", "Inhale cool air through tongue.", "Close mouth, exhale through nose."] },
+    { id: 103, title: "Anulom Vilom (Alternate Nostril)", category: "Yoga", subtitle: "20 min • Mind Balance", img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800", reps: "15 Mins", sets: 4, duration: 1200, benefits: "Balances nervous system & lowers cortisol.", steps: ["Sit erect with eyes closed.", "Close right nostril with thumb, inhale left.", "Close left nostril, exhale right.", "Inhale right, close right, exhale left."] }
+  ];
+
+  const moderateStressYoga = [
+    { id: 201, title: "Nadi Shodhana Pranayama", category: "Yoga", subtitle: "12 min • Harmony Flow", img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800", reps: "12 Cycles", sets: 3, duration: 720, benefits: "Clears energy channels & improves focus.", steps: ["Sit in Vishnu Mudra.", "Alternate breathing with gentle pauses."] },
+    { id: 202, title: "Balasana (Child's Pose Flow)", category: "Yoga", subtitle: "10 min • Restorative Stretch", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800", reps: "5 Mins Hold", sets: 2, duration: 600, benefits: "Stretches hips & lower back.", steps: ["Kneel on floor with big toes touching.", "Lower torso between thighs and extend arms."] },
+    { id: 203, title: "Vrikshasana (Tree Pose Balance)", category: "Yoga", subtitle: "10 min • Focus & Balance", img: "https://images.unsplash.com/photo-1510894347713-fc3ed6fdf539?w=800", reps: "2 Mins Hold", sets: 3, duration: 600, benefits: "Enhances physical balance & leg strength.", steps: ["Shift weight onto left foot.", "Place right sole on inner left thigh.", "Hold palms in Namaste."] }
+  ];
+
+  const lowStressYoga = [
+    { id: 301, title: "Kapalbhati (Skull-Shining)", category: "Yoga", subtitle: "15 min • Detox & Vitality", img: "https://images.unsplash.com/photo-1510894347713-fc3ed6fdf539?w=800", reps: "3 Rounds", sets: 3, duration: 900, benefits: "Detoxifies lungs & energizes core.", steps: ["Forcefully contract abdomen to pump air out.", "Passive inhalation between exhalations."] },
+    { id: 302, title: "Surya Namaskar (Sun Flow)", category: "Yoga", subtitle: "15 min • Full Body Vitality", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800", reps: "12 Cycles", sets: 3, duration: 900, benefits: "Full body flexibility & posture alignment.", steps: ["Stand straight in Pranamasana.", "Inhale up, exhale down into forward bend."] },
+    { id: 303, title: "Virabhadrasana (Warrior Flow)", category: "Yoga", subtitle: "20 min • Strength & Power", img: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800", reps: "5 Breaths Hold", sets: 4, duration: 1200, benefits: "Builds leg strength & confidence.", steps: ["Step feet wide apart.", "Turn right foot out and bend right knee.", "Extend arms parallel to floor."] }
+  ];
+
+  const currentYogaSet = stressLevel >= 7 ? highStressYoga : stressLevel >= 4 ? moderateStressYoga : lowStressYoga;
+
   const filteredWorkouts = activeFilter === 'all' 
-    ? workouts 
+    ? [...workouts.filter(w => w.category !== 'Yoga'), ...currentYogaSet] 
+    : activeFilter === 'Yoga'
+    ? currentYogaSet
     : workouts.filter(w => w.category === activeFilter);
 
   const waterPercent = Math.min(100, Math.round((waterCount / 8) * 100));
