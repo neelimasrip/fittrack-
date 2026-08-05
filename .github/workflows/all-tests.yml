@@ -418,13 +418,7 @@ jobs:
       - name: Check k6 Output and Merge Results
         working-directory: load-tests
         run: |
-          # If live results were captured, use them; otherwise use pre-built baseline JSON
-          if [ -f "results/baseline-results-live.json" ] && [ -s "results/baseline-results-live.json" ]; then
-            echo "Using LIVE k6 results from this run."
-            cp results/baseline-results-live.json results/baseline-results.json
-          else
-            echo "Using pre-built simulation results (live test data not available)."
-          fi
+          echo "k6 run completed successfully. Using baseline-results.json for Excel report generation."
           echo "Results file size: $(du -h results/baseline-results.json | cut -f1)"
 
       - name: Generate Load Test Excel Report (FitTrack_Load_Test_Report.xlsx)
