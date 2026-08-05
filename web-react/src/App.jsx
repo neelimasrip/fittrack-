@@ -16,7 +16,7 @@ import {
 } from './firebase';
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('fit_logged_in') !== 'false');
+  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('fit_logged_in') === 'true');
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || 'Arjun Kumar');
   const [userEmail, setUserEmail] = useState(() => localStorage.getItem('userEmail') || 'arjun@fittrack.com');
 
