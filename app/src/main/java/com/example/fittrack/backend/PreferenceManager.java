@@ -214,7 +214,14 @@ public class PreferenceManager {
     }
 
     public float getStartWeight() {
-        return prefs.getFloat(KEY_START_WEIGHT, 0.0f);
+        float start = prefs.getFloat(KEY_START_WEIGHT, 0.0f);
+        if (start == 0.0f) {
+            start = prefs.getFloat(KEY_CURRENT_WEIGHT, 0.0f);
+            if (start != 0.0f) {
+                prefs.edit().putFloat(KEY_START_WEIGHT, start).apply();
+            }
+        }
+        return start;
     }
 
     public void setGoalWeight(float weight) {

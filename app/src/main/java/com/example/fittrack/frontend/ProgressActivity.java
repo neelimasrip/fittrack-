@@ -77,7 +77,7 @@ public class ProgressActivity extends BaseActivity {
 
     private void loadUserData() {
         String name = preferenceManager.getUserName();
-        String display = name.isEmpty() ? "User" : name;
+        String display = name.isEmpty() ? "User" : name.split(" ")[0];
         binding.tvProgressGreeting.setText(String.format(Locale.getDefault(), "Keep Going, %s!", display));
 
         loadWeightData();
@@ -133,7 +133,17 @@ public class ProgressActivity extends BaseActivity {
         binding.tvCurrentWeight.setText(String.format(Locale.getDefault(), "%.1f kg", current));
         binding.tvStartWeight.setText(String.format(Locale.getDefault(), "%.1f kg", start));
         binding.tvGoalWeight.setText(String.format(Locale.getDefault(), "%.1f kg", goal));
-        binding.tvWeightChange.setText(String.format(Locale.getDefault(), "%.1f kg", current - start));
+        
+        float diff = start - current;
+        binding.tvWeightChange.setText(String.format(Locale.getDefault(), "%.1f kg", Math.abs(diff)));
+        
+        if (diff > 0) {
+            binding.tvProgressSummary.setText(String.format(Locale.getDefault(), "You've lost %.1f kg recently.", diff));
+        } else if (diff < 0) {
+            binding.tvProgressSummary.setText(String.format(Locale.getDefault(), "You've gained %.1f kg recently.", Math.abs(diff)));
+        } else {
+            binding.tvProgressSummary.setText("You are maintaining your weight.");
+        }
         
         updateRecentEntries();
     }
