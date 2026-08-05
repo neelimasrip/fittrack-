@@ -244,6 +244,11 @@ public class LoginActivity extends BaseActivity {
                             preferenceManager.saveOnboardingData(gender, primaryGoal.intValue(), secondaryGoal.intValue(), activityLevel);
                         }
                         
+                        Double goalWeightVal = documentSnapshot.getDouble("goalWeight");
+                        if (goalWeightVal != null && goalWeightVal > 0) {
+                            preferenceManager.setGoalWeight(goalWeightVal.floatValue());
+                        }
+                        
                         preferenceManager.setFirstRun(false);
                     }
                     preferenceManager.setLoggedIn(true);

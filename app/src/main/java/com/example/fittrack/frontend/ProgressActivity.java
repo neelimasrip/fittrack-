@@ -114,7 +114,19 @@ public class ProgressActivity extends BaseActivity {
                .setPositiveButton("Save", (dialog, which) -> {
                    String goalStr = etGoal.getText().toString();
                    if (!goalStr.isEmpty()) {
-                       preferenceManager.setGoalWeight(Float.parseFloat(goalStr));
+                       float newGoal = Float.parseFloat(goalStr);
+                       preferenceManager.setGoalWeight(newGoal);
+                       
+                       // Sync with Firestore
+                       com.google.firebase.auth.FirebaseAuth mAuth = com.google.firebase.auth.FirebaseAuth.getInstance();
+                       if (mAuth.getCurrentUser() != null) {
+                           java.util.Map<String, Object> updates = new java.util.HashMap<>();
+                           updates.put("goalWeight", newGoal);
+                           com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                               .collection("users").document(mAuth.getCurrentUser().getUid())
+                               .update(updates);
+                       }
+                       
                        loadWeightData();
                    }
                })
