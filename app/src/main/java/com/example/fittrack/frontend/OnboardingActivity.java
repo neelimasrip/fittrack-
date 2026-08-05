@@ -133,6 +133,18 @@ public class OnboardingActivity extends AppCompatActivity {
                 return;
             }
 
+            // Parse height and weight
+            float weight = 75.0f;
+            float height = 180.0f;
+            try {
+                if (!binding.etWeight.getText().toString().trim().isEmpty()) {
+                    weight = Float.parseFloat(binding.etWeight.getText().toString().trim());
+                }
+                if (!binding.etHeight.getText().toString().trim().isEmpty()) {
+                    height = Float.parseFloat(binding.etHeight.getText().toString().trim());
+                }
+            } catch (NumberFormatException ignored) {}
+
             // Save onboarding data locally
             preferenceManager.saveOnboardingData(
                 selectedGender, 
@@ -140,6 +152,10 @@ public class OnboardingActivity extends AppCompatActivity {
                 secondarySelected, 
                 activityLevels[selectedActivityIndex]
             );
+            
+            // Save physical attributes
+            preferenceManager.setHeight(height);
+            preferenceManager.saveWeight(weight, new java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault()).format(new java.util.Date()));
 
             // Sync with Firestore
             if (mAuth.getCurrentUser() != null) {
@@ -148,6 +164,8 @@ public class OnboardingActivity extends AppCompatActivity {
                 onboarding.put("primaryGoal", primarySelected);
                 onboarding.put("secondaryGoal", secondarySelected);
                 onboarding.put("activityLevel", activityLevels[selectedActivityIndex]);
+                onboarding.put("currentWeight", weight);
+                onboarding.put("userHeight", height);
                 
                 db.collection("users").document(mAuth.getCurrentUser().getUid())
                     .update(onboarding);

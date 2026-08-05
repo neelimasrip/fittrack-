@@ -190,6 +190,10 @@ public class PreferenceManager {
         return prefs.getFloat(KEY_USER_HEIGHT, 175.0f);
     }
 
+    public void setHeight(float height) {
+        prefs.edit().putFloat(KEY_USER_HEIGHT, height).apply();
+    }
+
     public void saveProfileImage(String uri) {
         prefs.edit().putString(KEY_PROFILE_IMAGE, uri).apply();
     }
