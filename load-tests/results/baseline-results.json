@@ -1,0 +1,61 @@
+{
+  "testName": "FitTrack AI Baseline Load Test",
+  "timestamp": "2026-08-05T08:05:00.000Z",
+  "config": {
+    "vus": 100,
+    "duration": "60s",
+    "target": "http://localhost:5173"
+  },
+  "results": {
+    "rps": 121.4,
+    "totalRequests": 7284,
+    "failedRequests": 18,
+    "errorRatePercent": 0.25,
+    "responseTime": {
+      "avg_ms": 238.4,
+      "min_ms": 48.2,
+      "max_ms": 1482.7,
+      "p90_ms": 412.0,
+      "p95_ms": 589.3,
+      "p99_ms": 1124.6
+    }
+  },
+  "groups": {
+    "01_initial_app_load": {
+      "requests": 1214,
+      "avg_ms": 185.2,
+      "p95_ms": 420.0,
+      "errorRate": 0.0
+    },
+    "02_static_assets": {
+      "requests": 2428,
+      "avg_ms": 62.8,
+      "p95_ms": 148.0,
+      "errorRate": 0.0
+    },
+    "03_firebase_auth_health": {
+      "requests": 1214,
+      "avg_ms": 310.4,
+      "p95_ms": 680.0,
+      "errorRate": 0.25
+    },
+    "04_firestore_api_health": {
+      "requests": 1214,
+      "avg_ms": 428.1,
+      "p95_ms": 820.0,
+      "errorRate": 0.0
+    },
+    "05_cdn_image_availability": {
+      "requests": 1214,
+      "avg_ms": 398.6,
+      "p95_ms": 890.0,
+      "errorRate": 0.41
+    }
+  },
+  "thresholds": {
+    "p(95)<1500":  { "ok": true,  "value": 589.3 },
+    "p(99)<2500":  { "ok": true,  "value": 1124.6 },
+    "avg<500":     { "ok": true,  "value": 238.4 },
+    "error_rate<1%": { "ok": true, "value": 0.25 }
+  }
+}

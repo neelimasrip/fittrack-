@@ -1,0 +1,13 @@
+{
+  "name": "fittrack-load-tests",
+  "version": "1.0.0",
+  "description": "Baseline & Load Testing for FitTrack AI Web Application using k6",
+  "scripts": {
+    "install-k6": "winget install k6 --silent || echo 'Install k6 from https://k6.io/docs/get-started/installation/'",
+    "baseline": "k6 run tests/baseline-load-test.js",
+    "baseline:json": "k6 run --out json=results/baseline-results.json tests/baseline-load-test.js",
+    "report": "python generate_load_report.py",
+    "full": "npm run baseline:json && npm run report"
+  },
+  "devDependencies": {}
+}
