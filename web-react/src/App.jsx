@@ -10,6 +10,7 @@ import {
   signOut, 
   GoogleAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
   doc, getDoc, setDoc, updateDoc 
 } from './firebase';
 
@@ -346,6 +347,19 @@ export default function App() {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!inputEmail.trim()) {
+      alert("Please enter your email address first in the email field.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, inputEmail.trim());
+      alert(`Password reset link sent to ${inputEmail}.\n\nIMPORTANT: Check your Inbox AND Spam/Junk folder!`);
+    } catch (err) {
+      alert(`Password reset link requested for ${inputEmail}.\n\nIMPORTANT: Check your Inbox AND Spam/Junk folder!`);
+    }
+  };
+
   const startWorkoutSession = (w) => {
     setSelectedWorkout(w);
     setWorkoutTimer(w.duration || 1200);
@@ -511,6 +525,19 @@ export default function App() {
               style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff', outline: 'none' }}
               required 
             />
+
+            {authMode === 'signin' && (
+              <div style={{ textAlign: 'right', marginTop: '-6px' }}>
+                <button 
+                  type="button" 
+                  onClick={handleResetPassword}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            )}
+
             <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', marginTop: '8px' }}>
               {authMode === 'signin' ? 'Sign In to FitTrack' : 'Create Account'}
             </button>
