@@ -59,6 +59,9 @@ public class DashboardActivity extends BaseActivity {
 
         binding.btnBell.setOnClickListener(v -> 
             startActivity(new Intent(this, NotificationsActivity.class)));
+
+        binding.cardHolisticScore.setOnClickListener(v -> 
+            startActivity(new Intent(this, FitnessScoreActivity.class)));
     }
 
     private void updateFitnessScore(int calories, int water) {
