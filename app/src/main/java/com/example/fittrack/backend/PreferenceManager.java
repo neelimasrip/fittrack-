@@ -317,19 +317,7 @@ public class PreferenceManager {
     }
 
     public void clearProfile() {
-        prefs.edit()
-                .remove(KEY_USER_NAME)
-                .remove(KEY_USER_EMAIL)
-                .remove(KEY_USER_PHONE)
-                .remove(KEY_USER_HEIGHT)
-                .remove(KEY_CURRENT_WEIGHT)
-                .remove(KEY_START_WEIGHT)
-                .remove(KEY_GOAL_WEIGHT)
-                .remove(KEY_PROFILE_IMAGE)
-                .remove(KEY_TOTAL_WORKOUTS)
-                .remove(KEY_TOTAL_CALORIES)
-                .remove(KEY_WATER_GLASSES)
-                .apply();
+        prefs.edit().clear().apply();
     }
 
     public void incrementWorkoutCount(int calories) {

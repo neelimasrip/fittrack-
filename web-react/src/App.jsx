@@ -165,9 +165,9 @@ export default function App() {
     } catch (e) {
       console.warn("Firebase signOut:", e);
     }
-    localStorage.setItem('isLoggedIn', 'false');
-    localStorage.setItem('fit_logged_in', 'false');
+    localStorage.clear();
     setIsLoggedIn(false);
+    window.location.reload();
   };
 
   const handleSignIn = async (e) => {
