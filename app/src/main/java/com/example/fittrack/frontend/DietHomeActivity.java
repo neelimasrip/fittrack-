@@ -103,7 +103,7 @@ public class DietHomeActivity extends BaseActivity {
     }
 
     private void setupClickListeners() {
-        binding.btnInfo.setOnClickListener(v -> Toast.makeText(this, "Mark meals as completed to track your calories!", Toast.LENGTH_SHORT).show());
+        binding.btnInfo.setOnClickListener(v -> showInfoDialog());
         binding.fabAddMeal.setOnClickListener(v -> showAddMealDialog());
         binding.ivCheckBreakfast.setOnClickListener(v -> toggleMealStatus(v, "Breakfast"));
         binding.ivCheckLunch.setOnClickListener(v -> toggleMealStatus(v, "Lunch"));
@@ -137,6 +137,14 @@ public class DietHomeActivity extends BaseActivity {
         view.findViewById(R.id.option_regional).setOnClickListener(v -> { dialog.dismiss(); startActivity(new Intent(this, RegionalDietActivity.class)); });
         view.findViewById(R.id.option_quick_add).setOnClickListener(v -> { dialog.dismiss(); startActivity(new Intent(this, QuickLogActivity.class)); });
         view.findViewById(R.id.option_pantry).setOnClickListener(v -> { dialog.dismiss(); startActivity(new Intent(this, PantryGeneratorActivity.class)); });
+        dialog.setContentView(view);
+        dialog.show();
+    }
+
+    private void showInfoDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_diet_info, null);
+        view.findViewById(R.id.btn_got_it).setOnClickListener(v -> dialog.dismiss());
         dialog.setContentView(view);
         dialog.show();
     }

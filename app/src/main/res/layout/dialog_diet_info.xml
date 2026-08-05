@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:background="#E0E0E0" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="About Your Diet Plan"
+        android:textColor="#1F3864"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your daily calorie target is automatically calculated based on your profile (height, weight, and goals) during onboarding. Currently, it's set to a baseline of 2000 kcal for general maintenance."
+        android:textColor="#555555"
+        android:textSize="15sp"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="16dp" />
+        
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Macro Breakdown"
+        android:textColor="#1F3864"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+        
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="• Protein: Crucial for muscle repair and growth.\n• Carbs: Your body's primary energy source.\n• Fats: Essential for hormone production and nutrient absorption."
+        android:textColor="#555555"
+        android:textSize="15sp"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="24dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_got_it"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Got It"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:backgroundTint="#1A56A0"
+        app:cornerRadius="12dp" />
+
+</LinearLayout>
