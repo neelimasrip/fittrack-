@@ -223,11 +223,28 @@ public class LoginActivity extends BaseActivity {
                     if (documentSnapshot.exists()) {
                         String name = documentSnapshot.getString("name");
                         String email = documentSnapshot.getString("email");
+                        String phone = documentSnapshot.getString("phone");
                         Double weightVal = documentSnapshot.getDouble("currentWeight");
                         Double heightVal = documentSnapshot.getDouble("userHeight");
                         float weight = weightVal != null ? weightVal.floatValue() : 0;
                         float height = heightVal != null ? heightVal.floatValue() : 0;
-                        preferenceManager.saveProfile(name != null ? name : "", email != null ? email : "", "", weight, height);
+                        preferenceManager.saveProfile(name != null ? name : "", email != null ? email : "", phone != null ? phone : "", weight, height);
+                        
+                        String profileImage = documentSnapshot.getString("profileImage");
+                        if (profileImage != null && !profileImage.isEmpty()) {
+                            preferenceManager.saveProfileImage(profileImage);
+                        }
+
+                        String gender = documentSnapshot.getString("gender");
+                        Long primaryGoal = documentSnapshot.getLong("primaryGoal");
+                        Long secondaryGoal = documentSnapshot.getLong("secondaryGoal");
+                        String activityLevel = documentSnapshot.getString("activityLevel");
+                        
+                        if (gender != null && primaryGoal != null && secondaryGoal != null && activityLevel != null) {
+                            preferenceManager.saveOnboardingData(gender, primaryGoal.intValue(), secondaryGoal.intValue(), activityLevel);
+                        }
+                        
+                        preferenceManager.setFirstRun(false);
                     }
                     preferenceManager.setLoggedIn(true);
                     Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
