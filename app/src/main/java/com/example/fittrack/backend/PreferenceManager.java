@@ -356,7 +356,15 @@ public class PreferenceManager {
     }
 
     public void clearProfile() {
+        boolean rememberMe = isRememberMe();
+        String savedEmail = getSavedEmail();
+        String savedPassword = getSavedPassword();
+
         prefs.edit().clear().apply();
+
+        if (rememberMe) {
+            saveLoginCredentials(savedEmail, savedPassword, true);
+        }
     }
 
     public void incrementWorkoutCount(int calories) {
