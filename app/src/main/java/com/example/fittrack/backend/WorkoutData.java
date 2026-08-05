@@ -100,6 +100,29 @@ public class WorkoutData {
                 "Keep your core engaged throughout."
             }
         ));
+        workouts.add(new Workout(
+            "Vinyasa Flow", "20 min • Medium", "Dynamic yoga linking breath to movement.", "Sun Salutation B", 
+            "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400", 5, 2, "Yoga", "Medium",
+            new String[]{
+                "Start in Mountain Pose at the top of your mat.",
+                "Inhale, sweep arms overhead.",
+                "Exhale, fold forward.",
+                "Inhale, lift halfway up.",
+                "Exhale, step back to plank and lower through Chaturanga.",
+                "Inhale to Upward-Facing Dog, exhale to Downward-Facing Dog."
+            }
+        ));
+        workouts.add(new Workout(
+            "Morning Pranayama", "10 min • Easy", "Breathing exercises for clarity and focus.", "Anulom Vilom", 
+            "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400", 1, 10, "Yoga", "Easy",
+            new String[]{
+                "Sit comfortably in a cross-legged position.",
+                "Close your right nostril with your right thumb.",
+                "Inhale deeply through your left nostril.",
+                "Close left nostril, exhale through the right.",
+                "Inhale through the right, exhale through the left."
+            }
+        ));
         return workouts;
     }
 
