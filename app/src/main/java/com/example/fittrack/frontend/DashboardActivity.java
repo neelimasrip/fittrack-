@@ -62,35 +62,14 @@ public class DashboardActivity extends BaseActivity {
     }
 
     private void updateFitnessScore(int calories, int water) {
-        float waterScore = (Math.min(water, 8) / 8.0f) * 25;
-        float ds = 0;
-        if (calories > 0) {
-            float ratio = calories / 2000.0f;
-            if (ratio > 1.0f) ratio = 2.0f - ratio;
-            ds = Math.max(0, ratio * 25);
-        }
-        int workouts = preferenceManager.getTotalWorkouts();
-        float workoutScore = (Math.min(workouts, 10) / 10.0f) * 50;
+        com.example.fittrack.backend.FitnessScoreCalculator.ScoreResult result = 
+            com.example.fittrack.backend.FitnessScoreCalculator.calculateScore(this);
 
-        int finalScore = Math.round(waterScore + ds + workoutScore);
-        if (finalScore < 10) finalScore = 10;
-
-        binding.tvFitnessScore.setText(String.valueOf(finalScore));
-
-        if (finalScore >= 80) {
-            binding.tvFitnessLevel.setText("Excellent");
-            binding.tvFitnessLevel.setBackgroundResource(R.drawable.bg_chip_green);
-        } else if (finalScore >= 60) {
-            binding.tvFitnessLevel.setText("Good");
-            binding.tvFitnessLevel.setBackgroundResource(R.drawable.bg_chip_green);
-        } else if (finalScore >= 40) {
-            binding.tvFitnessLevel.setText("Average");
-            binding.tvFitnessLevel.setBackgroundColor(android.graphics.Color.parseColor("#F59E0B")); 
-        } else {
-            binding.tvFitnessLevel.setText("Needs Focus");
-            binding.tvFitnessLevel.setBackgroundColor(android.graphics.Color.RED);
-        }
+        binding.tvFitnessScore.setText(String.valueOf(result.finalScore));
+        binding.tvFitnessLevel.setText(result.status);
+        binding.tvFitnessLevel.setBackgroundColor(result.color);
     }
+
 
     @Override
     protected void onResume() {

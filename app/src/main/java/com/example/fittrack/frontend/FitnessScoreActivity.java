@@ -31,6 +31,18 @@ public class FitnessScoreActivity extends BaseActivity {
         loadImages();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        com.example.fittrack.backend.FitnessScoreCalculator.ScoreResult result = 
+            com.example.fittrack.backend.FitnessScoreCalculator.calculateScore(this);
+            
+        binding.tvScoreNumber.setText(String.valueOf(result.finalScore));
+        binding.tvScoreStatus.setText(result.status);
+        binding.tvScoreStatus.setTextColor(result.color);
+        binding.scoreProgress.setProgress(result.finalScore);
+    }
+
     private void loadImages() {
         Glide.with(this).load("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400").diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.ic_workout).centerCrop().into(binding.ivScoreWorkout);
         Glide.with(this).load("https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400").diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.ic_diet).centerCrop().into(binding.ivScoreDiet);
