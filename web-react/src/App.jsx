@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Zap, Home, Dumbbell, Utensils, Droplet, ChartLine, User, 
-  Bell, Settings, Plus, Play, Pause, RotateCcw, Check, Earth, Carrot, Bolt, LogOut, X, Award, Target, Sparkles, AlertCircle, Smile, Activity, Brain
+  Bell, Settings, Plus, Play, Pause, RotateCcw, Check, Earth, Carrot, Bolt, LogOut, X, Award, Target, Sparkles, AlertCircle, Smile, Activity, Brain,
+  Calendar, Edit2, Info
 } from 'lucide-react';
 import { 
   auth, db, 
@@ -65,6 +66,8 @@ export default function App() {
     { date: 'Aug 05', weight: 68.5 }
   ]);
   const [newWeightInput, setNewWeightInput] = useState('');
+  const [pastWeightDate, setPastWeightDate] = useState('');
+  const [editGoalInput, setEditGoalInput] = useState('');
 
   const [eatenMeals, setEatenMeals] = useState({});
 
@@ -197,6 +200,11 @@ export default function App() {
         }
         if (data.currentWeight) fetchedWeight = parseFloat(data.currentWeight);
         if (data.userHeight) fetchedHeight = parseFloat(data.userHeight);
+        if (data.goalWeight) {
+          const gw = parseFloat(data.goalWeight);
+          setGoalWeight(gw);
+          localStorage.setItem('goalWeight', gw);
+        }
       }
 
       if (!fetchedName) {
@@ -438,6 +446,37 @@ export default function App() {
       setUserWeight(wVal);
       setWeightHistory(prev => [{ date: 'Today', weight: wVal }, ...prev]);
       setNewWeightInput('');
+      setActiveModal(null);
+    }
+  };
+
+  const submitPastWeight = (e) => {
+    e.preventDefault();
+    if (newWeightInput && pastWeightDate) {
+      const wVal = parseFloat(newWeightInput);
+      setWeightHistory(prev => {
+         const updated = [...prev, { date: pastWeightDate, weight: wVal }];
+         return updated;
+      });
+      setNewWeightInput('');
+      setPastWeightDate('');
+      setActiveModal(null);
+    }
+  };
+
+  const submitEditGoal = async (e) => {
+    e.preventDefault();
+    if (editGoalInput) {
+      const gw = parseFloat(editGoalInput);
+      setGoalWeight(gw);
+      if (auth.currentUser) {
+         try { 
+           await updateDoc(doc(db, "users", auth.currentUser.uid), { goalWeight: gw }); 
+         } catch (err) {
+           console.warn("Firestore edit goal error:", err);
+         }
+      }
+      setEditGoalInput('');
       setActiveModal(null);
     }
   };
@@ -795,8 +834,13 @@ export default function App() {
               <div className="glass-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <div>
-                    <h3>{activeDietPlan} Plan</h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Custom Rotational Nutrition Plan</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ margin: 0 }}>{activeDietPlan} Plan</h3>
+                      <button onClick={() => setActiveModal('diet_info')} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: 0 }}>
+                        <Info size={16} />
+                      </button>
+                    </div>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '4px 0 0 0' }}>Custom Rotational Nutrition Plan</p>
                   </div>
                   <button className="btn-primary" onClick={() => setActiveModal('quick_log')} style={{ padding: '8px 14px', fontSize: '13px' }}>
                     <Plus size={14} /> Add Custom
@@ -877,26 +921,54 @@ export default function App() {
               <div className="glass-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3>Weight & BMI Stats</h3>
-                  <button className="btn-primary" onClick={() => setActiveModal('add_weight')} style={{ padding: '6px 12px', fontSize: '12px' }}>
-                    <Plus size={14} /> Log Weight
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn-primary" onClick={() => setActiveModal('log_past_weight')} style={{ padding: '6px 8px', fontSize: '12px', background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+                      <Calendar size={14} /> 
+                    </button>
+                    <button className="btn-primary" onClick={() => setActiveModal('add_weight')} style={{ padding: '6px 12px', fontSize: '12px' }}>
+                      <Plus size={14} /> Log Weight
+                    </button>
+                  </div>
                 </div>
                 <div style={{ fontSize: '36px', fontWeight: 800, margin: '12px 0', color: 'var(--primary)' }}>{userWeight} kg</div>
                 <p style={{ color: 'var(--text-secondary)' }}>BMI: {bmi} ({bmi < 25 ? 'Healthy Weight' : 'Overweight'})</p>
 
                 <div style={{ marginTop: '20px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '8px' }}>Recent Weight History</h4>
-                  {weightHistory.map((h, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)', fontSize: '13px' }}>
-                      <span>{h.date}</span>
-                      <span style={{ fontWeight: 600 }}>{h.weight} kg</span>
-                    </div>
-                  ))}
+                  <h4 style={{ fontSize: '14px', marginBottom: '8px' }}>Progress Chart</h4>
+                  <div style={{ width: '100%', height: '150px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', position: 'relative' }}>
+                    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                      <path 
+                        d={`M 0 100 ${weightHistory.map((h, i) => {
+                          const x = i === 0 ? 0 : (i / Math.max(1, weightHistory.length - 1)) * 100;
+                          const minW = Math.min(...weightHistory.map(w => w.weight)) - 5;
+                          const maxW = Math.max(...weightHistory.map(w => w.weight)) + 5;
+                          const y = 100 - (((h.weight - minW) / (maxW - minW)) * 100);
+                          return `L ${100 - x} ${y}`;
+                        }).join(' ')}`}
+                        fill="none" 
+                        stroke="#06B6D4" 
+                        strokeWidth="3" 
+                        strokeLinejoin="round" 
+                      />
+                      {weightHistory.map((h, i) => {
+                          const x = i === 0 ? 0 : (i / Math.max(1, weightHistory.length - 1)) * 100;
+                          const minW = Math.min(...weightHistory.map(w => w.weight)) - 5;
+                          const maxW = Math.max(...weightHistory.map(w => w.weight)) + 5;
+                          const y = 100 - (((h.weight - minW) / (maxW - minW)) * 100);
+                          return <circle key={i} cx={100 - x} cy={y} r="3" fill="#10B981" />
+                      })}
+                    </svg>
+                  </div>
                 </div>
               </div>
 
               <div className="glass-card">
-                <h3>AI Goal Predictor</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3>AI Goal Predictor</h3>
+                  <button className="btn-primary" onClick={() => setActiveModal('edit_goal')} style={{ padding: '4px 8px', fontSize: '12px', background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+                    <Edit2 size={12} /> Edit
+                  </button>
+                </div>
                 <p style={{ color: 'var(--text-secondary)', margin: '8px 0' }}>Target Goal: {goalWeight} kg</p>
                 <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--secondary)', margin: '12px 0' }}>
                   Estimated Date: Sept 24, 2026
@@ -1122,6 +1194,73 @@ export default function App() {
               </div>
             )}
 
+            {activeModal === 'log_past_weight' && (
+              <div>
+                <h3>Log Past Weight</h3>
+                <form onSubmit={submitPastWeight} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+                  <input 
+                    type="date"
+                    value={pastWeightDate}
+                    onChange={e => setPastWeightDate(e.target.value)}
+                    style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    required
+                  />
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={newWeightInput} 
+                    onChange={e => setNewWeightInput(e.target.value)} 
+                    placeholder="Weight in kg (e.g. 68.2)"
+                    style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    required 
+                  />
+                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>
+                    Save Past Entry
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {activeModal === 'edit_goal' && (
+              <div>
+                <h3>Edit Goal Weight</h3>
+                <form onSubmit={submitEditGoal} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={editGoalInput} 
+                    onChange={e => setEditGoalInput(e.target.value)} 
+                    placeholder="Goal Weight in kg (e.g. 65.0)"
+                    style={{ padding: '12px 14px', borderRadius: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: '#fff' }}
+                    required 
+                  />
+                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>
+                    Update Goal
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {activeModal === 'diet_info' && (
+              <div>
+                <h3>About Your Diet Plan</h3>
+                <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.5' }}>
+                    Your daily calorie target is automatically calculated based on your profile (height, weight, and goals). Currently, it's set to a baseline of 2000 kcal for general maintenance.
+                  </p>
+                  <h4 style={{ color: 'var(--primary)', margin: '8px 0 0 0' }}>Macro Breakdown</h4>
+                  <ul style={{ color: 'var(--text-secondary)', fontSize: '15px', paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <li><strong>Protein:</strong> Crucial for muscle repair and growth.</li>
+                    <li><strong>Carbs:</strong> Your body's primary energy source.</li>
+                    <li><strong>Fats:</strong> Essential for hormone production and nutrient absorption.</li>
+                  </ul>
+                  <button className="btn-primary" onClick={() => setActiveModal(null)} style={{ width: '100%', justifyContent: 'center', padding: '12px', marginTop: '8px' }}>
+                    Got It
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* MODAL 6: EDIT PROFILE */}
             {activeModal === 'edit_profile' && (
               <div>
@@ -1139,6 +1278,7 @@ export default function App() {
                         name: userName,
                         userHeight: userHeight,
                         currentWeight: userWeight,
+                        goalWeight: goalWeight,
                         profileImage: userAvatar
                       });
                     } catch (err) {
