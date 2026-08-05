@@ -5,6 +5,12 @@ import com.example.fittrack.databinding.*;
 
 
 import com.example.fittrack.backend.PreferenceManager;
+import com.example.fittrack.backend.NotificationHelper;
+import android.os.Build;
+import android.content.pm.PackageManager;
+import androidx.core.content.ContextCompat;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.activity.result.ActivityResultLauncher;
 import com.example.fittrack.backend.DietData;
 import com.example.fittrack.backend.WorkoutData;
 
@@ -18,6 +24,18 @@ public class SettingsActivity extends AppCompatActivity {
 
     private ActivitySettingsBinding binding;
     private PreferenceManager preferenceManager;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    NotificationHelper.scheduleDailyReminder(this);
+                    android.widget.Toast.makeText(this, "Notifications enabled", android.widget.Toast.LENGTH_SHORT).show();
+                } else {
+                    preferenceManager.setNotificationsEnabled(false);
+                    binding.switchNotifications.setChecked(false);
+                    android.widget.Toast.makeText(this, "Permission required", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +54,24 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Initialize Notification Switch
         binding.switchNotifications.setChecked(preferenceManager.isNotificationsEnabled());
-        binding.switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                binding.switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferenceManager.setNotificationsEnabled(isChecked);
-            String message = isChecked ? "Notifications enabled" : "Notifications disabled";
-            android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show();
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                        NotificationHelper.scheduleDailyReminder(this);
+                        android.widget.Toast.makeText(this, "Notifications enabled", android.widget.Toast.LENGTH_SHORT).show();
+                    } else {
+                        requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+                    }
+                } else {
+                    NotificationHelper.scheduleDailyReminder(this);
+                    android.widget.Toast.makeText(this, "Notifications enabled", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                NotificationHelper.cancelReminder(this);
+                android.widget.Toast.makeText(this, "Notifications disabled", android.widget.Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Initialize Dark Mode Switch

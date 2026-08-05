@@ -5,6 +5,7 @@ import com.example.fittrack.databinding.*;
 
 
 import com.example.fittrack.backend.PreferenceManager;
+import com.example.fittrack.backend.NotificationHelper;
 import com.example.fittrack.backend.DietData;
 import com.example.fittrack.backend.WorkoutData;
 
@@ -28,6 +29,11 @@ public class DashboardActivity extends BaseActivity {
         setContentView(binding.getRoot());
 
         preferenceManager = new PreferenceManager(this);
+
+        NotificationHelper.createNotificationChannel(this);
+        if (preferenceManager.isNotificationsEnabled()) {
+            NotificationHelper.scheduleDailyReminder(this);
+        }
         setupBottomNav(R.id.nav_home);
 
         binding.btnWorkout.setOnClickListener(v -> 
