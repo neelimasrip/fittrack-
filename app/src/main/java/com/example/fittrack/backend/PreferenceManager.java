@@ -247,6 +247,25 @@ public class PreferenceManager {
                 .putString(KEY_WEIGHT_HISTORY, history)
                 .putFloat(KEY_CURRENT_WEIGHT, weight)
                 .apply();
+        syncToFirestore();
+    }
+
+    private void syncToFirestore() {
+        try {
+            com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+            if (auth.getCurrentUser() != null) {
+                String uid = auth.getCurrentUser().getUid();
+                com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                data.put("waterGlasses", getWaterGlasses());
+                data.put("totalWorkouts", getTotalWorkouts());
+                data.put("totalCaloriesBurned", getTotalCalories());
+                data.put("currentWeight", getCurrentWeight());
+                db.collection("users").document(uid).set(data, com.google.firebase.firestore.SetOptions.merge());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public float getStartWeight() {
@@ -378,6 +397,7 @@ public class PreferenceManager {
                 .putInt(KEY_TOTAL_WORKOUTS, count + 1)
                 .putInt(KEY_TOTAL_CALORIES, totalCals + calories)
                 .apply();
+        syncToFirestore();
     }
 
     public int getTotalWorkouts() {
@@ -390,6 +410,7 @@ public class PreferenceManager {
 
     public void setWaterGlasses(int count) {
         prefs.edit().putInt(KEY_WATER_GLASSES, count).apply();
+        syncToFirestore();
     }
 
     public int getWaterGlasses() {

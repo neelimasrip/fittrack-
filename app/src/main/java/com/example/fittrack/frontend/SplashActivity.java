@@ -39,7 +39,10 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Intent intent;
-            if (preferenceManager.isLoggedIn()) {
+            com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+            boolean isLoggedIn = preferenceManager.isLoggedIn() && auth.getCurrentUser() != null;
+            
+            if (isLoggedIn) {
                 if (preferenceManager.isFirstRun()) {
                     intent = new Intent(SplashActivity.this, OnboardingActivity.class);
                 } else {

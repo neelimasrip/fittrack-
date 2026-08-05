@@ -42,7 +42,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
             if (intent != null) {
                 startActivity(intent);
-                overridePendingTransition(0, 0);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 finish();
                 return true;
             }
