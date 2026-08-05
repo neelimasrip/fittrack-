@@ -33,6 +33,7 @@ public class WorkoutDetailActivity extends BaseActivity {
         String imageUrl = getIntent().getStringExtra("workout_image");
         int reps = getIntent().getIntExtra("workout_reps", 12);
         int sets = getIntent().getIntExtra("workout_sets", 3);
+        String[] steps = getIntent().getStringArrayExtra("workout_steps");
 
         if (title != null) {
             binding.tvDetailTitle.setText(title);
@@ -53,6 +54,9 @@ public class WorkoutDetailActivity extends BaseActivity {
             intent.putExtra("exercise_image", imageUrl);
             intent.putExtra("reps", reps);
             intent.putExtra("total_sets", sets);
+            if (steps != null) {
+                intent.putExtra("exercise_steps", steps);
+            }
             
             int duration = 30; // default
             int calories = 300; // default estimated
@@ -74,6 +78,9 @@ public class WorkoutDetailActivity extends BaseActivity {
             Intent intent = new Intent(this, ExerciseDetailActivity.class);
             intent.putExtra("exercise_name", exercise != null ? exercise : "Dumbbell Bench Press");
             intent.putExtra("exercise_image", imageUrl);
+            if (steps != null) {
+                intent.putExtra("exercise_steps", steps);
+            }
             startActivity(intent);
         });
         

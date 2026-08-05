@@ -160,6 +160,9 @@ public class DashboardActivity extends BaseActivity {
             intent.putExtra("workout_image", todayWorkout.imageUrl);
             intent.putExtra("workout_reps", todayWorkout.reps);
             intent.putExtra("workout_sets", todayWorkout.sets);
+            if (todayWorkout.steps != null) {
+                intent.putExtra("workout_steps", todayWorkout.steps);
+            }
             startActivity(intent);
         });
     }

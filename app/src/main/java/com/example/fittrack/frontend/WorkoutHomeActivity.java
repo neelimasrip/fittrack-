@@ -92,11 +92,12 @@ public class WorkoutHomeActivity extends BaseActivity {
         binding.cardStressMapper.setOnClickListener(v -> startActivity(new Intent(this, StressMapperActivity.class)));
         binding.cardMicroWorkout.setOnClickListener(v -> startActivity(new Intent(this, MicroWorkoutActivity.class)));
 
-        binding.cardWorkout1.setOnClickListener(v -> openWorkoutDetail("Morning Cardio Blitz", "20 min • Easy", "High-energy cardio session.", "Jumping Jacks", "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800", 20, 3));
-        binding.cardWorkout2.setOnClickListener(v -> openWorkoutDetail("Advanced Power Lift", "60 min • Hard", "Heavy lifting.", "Deadlift", "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800", 8, 5));
-        binding.cardWorkout3.setOnClickListener(v -> openWorkoutDetail("HIIT Cardio Burn", "30 min • Medium", "Fat burning intervals.", "Burpees", "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=800", 15, 4));
-        binding.cardWorkout4.setOnClickListener(v -> openWorkoutDetail("Zen Yoga Flow", "15 min • Easy", "Relaxing yoga.", "Sun Salutation", "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800", 5, 3));
-        binding.cardWorkout5.setOnClickListener(v -> openWorkoutDetail("Core Crusher", "10 min • Medium", "Ab workout.", "Plank", "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800", 1, 4));
+        List<WorkoutData.Workout> workouts = WorkoutData.getAllWorkouts();
+        binding.cardWorkout1.setOnClickListener(v -> openWorkoutDetail(workouts.get(0).title, workouts.get(0).subtitle, workouts.get(0).description, workouts.get(0).exercise, workouts.get(0).imageUrl, workouts.get(0).reps, workouts.get(0).sets, workouts.get(0).steps));
+        binding.cardWorkout2.setOnClickListener(v -> openWorkoutDetail(workouts.get(1).title, workouts.get(1).subtitle, workouts.get(1).description, workouts.get(1).exercise, workouts.get(1).imageUrl, workouts.get(1).reps, workouts.get(1).sets, workouts.get(1).steps));
+        binding.cardWorkout3.setOnClickListener(v -> openWorkoutDetail(workouts.get(2).title, workouts.get(2).subtitle, workouts.get(2).description, workouts.get(2).exercise, workouts.get(2).imageUrl, workouts.get(2).reps, workouts.get(2).sets, workouts.get(2).steps));
+        binding.cardWorkout4.setOnClickListener(v -> openWorkoutDetail(workouts.get(3).title, workouts.get(3).subtitle, workouts.get(3).description, workouts.get(3).exercise, workouts.get(3).imageUrl, workouts.get(3).reps, workouts.get(3).sets, workouts.get(3).steps));
+        binding.cardWorkout5.setOnClickListener(v -> openWorkoutDetail(workouts.get(4).title, workouts.get(4).subtitle, workouts.get(4).description, workouts.get(4).exercise, workouts.get(4).imageUrl, workouts.get(4).reps, workouts.get(4).sets, workouts.get(4).steps));
 
         binding.btnFilter.setOnClickListener(this::showFilterMenu);
         binding.btnMenu.setOnClickListener(v -> Toast.makeText(this, "Menu drawer opening...", Toast.LENGTH_SHORT).show());
@@ -160,7 +161,7 @@ public class WorkoutHomeActivity extends BaseActivity {
         return categoryMatch && difficultyMatch;
     }
 
-    private void openWorkoutDetail(String title, String subtitle, String desc, String exercise, String imageUrl, int reps, int sets) {
+    private void openWorkoutDetail(String title, String subtitle, String desc, String exercise, String imageUrl, int reps, int sets, String[] steps) {
         Intent intent = new Intent(this, WorkoutDetailActivity.class);
         intent.putExtra("workout_title", title);
         intent.putExtra("workout_subtitle", subtitle);
@@ -169,6 +170,9 @@ public class WorkoutHomeActivity extends BaseActivity {
         intent.putExtra("workout_image", imageUrl);
         intent.putExtra("workout_reps", reps);
         intent.putExtra("workout_sets", sets);
+        if (steps != null) {
+            intent.putExtra("workout_steps", steps);
+        }
         startActivity(intent);
     }
 

@@ -40,6 +40,18 @@ public class ExerciseDetailActivity extends AppCompatActivity {
     }
 
     private void updateContentForExercise(String name) {
+        String[] steps = getIntent().getStringArrayExtra("exercise_steps");
+        if (steps != null && steps.length > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < steps.length; i++) {
+                sb.append((i + 1)).append(". ").append(steps[i]);
+                if (i < steps.length - 1) sb.append("\n");
+            }
+            binding.tvInstructions.setText(sb.toString());
+            return;
+        }
+
+        // Fallback to hardcoded logic if no steps provided
         if (name.contains("Jumping Jacks")) {
             binding.tvInstructions.setText("1. Stand with feet together and arms at sides.\n2. Jump while spreading legs and clapping hands overhead.\n3. Jump back to starting position.\n4. Repeat in a rhythmic motion.");
         } else if (name.contains("Burpees")) {
@@ -50,6 +62,8 @@ public class ExerciseDetailActivity extends AppCompatActivity {
             binding.tvInstructions.setText("1. Place forearms on the floor, elbows under shoulders.\n2. Extend legs back, balancing on toes.\n3. Keep body in a straight line from head to heels.\n4. Hold position while engaging core.");
         } else if (name.contains("Deadlift")) {
             binding.tvInstructions.setText("1. Stand with feet hip-width apart, barbell over mid-foot.\n2. Bend at hips and knees, grab the bar.\n3. Lift by extending hips and knees, keeping back straight.\n4. Lower the bar under control.");
+        } else {
+            binding.tvInstructions.setText("1. Get ready to perform " + name + ".\n2. Follow standard form.\n3. Breathe deeply.\n4. Complete all repetitions.");
         }
     }
 

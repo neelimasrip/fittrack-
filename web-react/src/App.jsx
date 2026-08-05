@@ -980,8 +980,19 @@ export default function App() {
               <div style={{ textAlign: 'center' }}>
                 <h3 style={{ fontSize: '22px', marginBottom: '8px' }}>{selectedWorkout.title}</h3>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>Set {completedSets} of {selectedWorkout.sets} • {selectedWorkout.reps}</p>
-                <img src={selectedWorkout.img} alt="Workout" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '16px', marginBottom: '20px' }} />
+                <img src={selectedWorkout.img} alt="Workout" style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '16px', marginBottom: '16px' }} />
                 
+                {selectedWorkout.steps && selectedWorkout.steps.length > 0 && (
+                  <div style={{ textAlign: 'left', marginBottom: '20px', padding: '12px', background: 'var(--bg-surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <h4 style={{ fontSize: '14px', marginBottom: '8px', color: 'var(--primary)' }}>How to perform:</h4>
+                    <ol style={{ fontSize: '13px', color: 'var(--text-secondary)', paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {selectedWorkout.steps.map((step, idx) => (
+                        <li key={idx}>{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
                 <div style={{ fontSize: '48px', fontWeight: 800, fontFamily: 'Outfit', color: 'var(--primary)', marginBottom: '20px' }}>
                   {formatTimer(workoutTimer)}
                 </div>
