@@ -141,8 +141,9 @@ public class EditProfileActivity extends AppCompatActivity {
                 user.put("phone", phone);
                 user.put("currentWeight", (double) weight);
                 user.put("userHeight", (double) height);
+                user.put("profileImage", preferenceManager.getProfileImage());
 
-                db.collection("users").document(uid).update(user);
+                db.collection("users").document(uid).set(user, com.google.firebase.firestore.SetOptions.merge());
             }
 
             Toast.makeText(

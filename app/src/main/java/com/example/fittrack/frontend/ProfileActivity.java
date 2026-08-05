@@ -65,41 +65,32 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void loadUserData() {
+        String name = preferenceManager.getUserName();
+        String email = preferenceManager.getUserEmail();
+        String imageUri = preferenceManager.getProfileImage();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
         if (user != null) {
+            if (email.isEmpty() && user.getEmail() != null) email = user.getEmail();
+            if (name.isEmpty() && user.getDisplayName() != null) name = user.getDisplayName();
+            if (imageUri.isEmpty() && user.getPhotoUrl() != null) imageUri = user.getPhotoUrl().toString();
+        }
 
-            binding.tvName.setText(
-                    user.getDisplayName() != null
-                            ? user.getDisplayName()
-                            : preferenceManager.getUserName()
-            );
+        binding.tvName.setText(!name.isEmpty() ? name : "FitTrack User");
+        binding.tvEmail.setText(!email.isEmpty() ? email : "user@fittrack.com");
 
-            binding.tvEmail.setText(user.getEmail());
-
-            if (user.getPhotoUrl() != null) {
-                Glide.with(this)
-                        .load(user.getPhotoUrl())
-                        .placeholder(R.drawable.ic_person)
-                        .circleCrop()
-                        .into(binding.ivProfilePic);
-            } else {
-                String imageUri = preferenceManager.getProfileImage();
-                if (!imageUri.isEmpty()) {
-                    Glide.with(this)
-                            .load(imageUri)
-                            .placeholder(R.drawable.ic_person)
-                            .circleCrop()
-                            .into(binding.ivProfilePic);
-                } else {
-                    Glide.with(this)
-                        .load("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200")
-                        .placeholder(R.drawable.ic_person)
-                        .circleCrop()
-                        .into(binding.ivProfilePic);
-                }
-            }
+        if (!imageUri.isEmpty()) {
+            Glide.with(this)
+                    .load(imageUri)
+                    .placeholder(R.drawable.ic_person)
+                    .circleCrop()
+                    .into(binding.ivProfilePic);
+        } else {
+            Glide.with(this)
+                    .load("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200")
+                    .placeholder(R.drawable.ic_person)
+                    .circleCrop()
+                    .into(binding.ivProfilePic);
         }
 
         binding.tvWeight.setText(
