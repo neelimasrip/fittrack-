@@ -7,11 +7,10 @@ public class PreferenceManager {
     private static final String PREF_NAME = "FitTrackPrefs";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
-    private static final String KEY_USER_PASSWORD = "userPassword";
     private static final String KEY_IS_REGISTERED = "isRegistered";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private static final String KEY_IS_FIRST_RUN = "isFirstRun";
-    
+
     // Onboarding data
     private static final String KEY_GENDER = "userGender";
     private static final String KEY_PRIMARY_GOAL = "primaryGoal";
@@ -22,19 +21,19 @@ public class PreferenceManager {
     private static final String KEY_CURRENT_WEIGHT = "currentWeight";
     private static final String KEY_START_WEIGHT = "startWeight";
     private static final String KEY_GOAL_WEIGHT = "goalWeight";
-    
+
     // User profile
     private static final String KEY_USER_PHONE = "userPhone";
     private static final String KEY_USER_HEIGHT = "userHeight";
     private static final String KEY_PROFILE_IMAGE = "profileImage";
     private static final String KEY_DARK_MODE = "darkMode";
     private static final String KEY_NOTIFICATIONS = "notifications";
-    
+
     // Workout Stats
     private static final String KEY_TOTAL_WORKOUTS = "totalWorkouts";
     private static final String KEY_TOTAL_CALORIES = "totalCalories";
     private static final String KEY_WATER_GLASSES = "waterGlasses";
-    
+
     // Diet data
     private static final String KEY_MEAL_RESET_DATE = "mealResetDate";
     private static final String KEY_MEAL_BREAKFAST_NAME = "mealBreakfastName";
@@ -45,12 +44,12 @@ public class PreferenceManager {
     private static final String KEY_MEAL_DINNER_KCAL = "mealDinnerKcal";
     private static final String KEY_MEAL_SNACKS_NAME = "mealSnacksName";
     private static final String KEY_MEAL_SNACKS_KCAL = "mealSnacksKcal";
-    
+
     private static final String KEY_MEAL_BREAKFAST_IMG = "mealBreakfastImg";
     private static final String KEY_MEAL_LUNCH_IMG = "mealLunchImg";
     private static final String KEY_MEAL_DINNER_IMG = "mealDinnerImg";
     private static final String KEY_MEAL_SNACKS_IMG = "mealSnacksImg";
-    
+
     private static final String KEY_BREAKFAST_DONE = "breakfastDone";
     private static final String KEY_LUNCH_DONE = "lunchDone";
     private static final String KEY_DINNER_DONE = "dinnerDone";
@@ -62,10 +61,10 @@ public class PreferenceManager {
         prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    public void saveMealPlan(String bName, int bKcal, String bImg, 
-                             String lName, int lKcal, String lImg,
-                             String dName, int dKcal, String dImg,
-                             String sName, int sKcal, String sImg) {
+    public void saveMealPlan(String bName, int bKcal, String bImg,
+            String lName, int lKcal, String lImg,
+            String dName, int dKcal, String dImg,
+            String sName, int sKcal, String sImg) {
         prefs.edit()
                 .putString(KEY_MEAL_BREAKFAST_NAME, bName)
                 .putInt(KEY_MEAL_BREAKFAST_KCAL, bKcal)
@@ -111,28 +110,44 @@ public class PreferenceManager {
 
     public String getMealImage(String type) {
         switch (type) {
-            case "Breakfast": return prefs.getString(KEY_MEAL_BREAKFAST_IMG, "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800");
-            case "Lunch": return prefs.getString(KEY_MEAL_LUNCH_IMG, "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400");
-            case "Dinner": return prefs.getString(KEY_MEAL_DINNER_IMG, "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800");
-            default: return prefs.getString(KEY_MEAL_SNACKS_IMG, "https://images.unsplash.com/photo-1536627242493-2059aa0926dd?w=400");
+            case "Breakfast":
+                return prefs.getString(KEY_MEAL_BREAKFAST_IMG,
+                        "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800");
+            case "Lunch":
+                return prefs.getString(KEY_MEAL_LUNCH_IMG,
+                        "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400");
+            case "Dinner":
+                return prefs.getString(KEY_MEAL_DINNER_IMG,
+                        "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800");
+            default:
+                return prefs.getString(KEY_MEAL_SNACKS_IMG,
+                        "https://images.unsplash.com/photo-1536627242493-2059aa0926dd?w=400");
         }
     }
 
     public String getMealName(String type) {
         switch (type) {
-            case "Breakfast": return prefs.getString(KEY_MEAL_BREAKFAST_NAME, "Breakfast Oats Idli");
-            case "Lunch": return prefs.getString(KEY_MEAL_LUNCH_NAME, "Lunch Brown Rice");
-            case "Dinner": return prefs.getString(KEY_MEAL_DINNER_NAME, "Dinner Ragi Dosa");
-            default: return prefs.getString(KEY_MEAL_SNACKS_NAME, "Snacks Fruits");
+            case "Breakfast":
+                return prefs.getString(KEY_MEAL_BREAKFAST_NAME, "Breakfast Oats Idli");
+            case "Lunch":
+                return prefs.getString(KEY_MEAL_LUNCH_NAME, "Lunch Brown Rice");
+            case "Dinner":
+                return prefs.getString(KEY_MEAL_DINNER_NAME, "Dinner Ragi Dosa");
+            default:
+                return prefs.getString(KEY_MEAL_SNACKS_NAME, "Snacks Fruits");
         }
     }
 
     public int getMealKcal(String type) {
         switch (type) {
-            case "Breakfast": return prefs.getInt(KEY_MEAL_BREAKFAST_KCAL, 280);
-            case "Lunch": return prefs.getInt(KEY_MEAL_LUNCH_KCAL, 420);
-            case "Dinner": return prefs.getInt(KEY_MEAL_DINNER_KCAL, 310);
-            default: return prefs.getInt(KEY_MEAL_SNACKS_KCAL, 120);
+            case "Breakfast":
+                return prefs.getInt(KEY_MEAL_BREAKFAST_KCAL, 280);
+            case "Lunch":
+                return prefs.getInt(KEY_MEAL_LUNCH_KCAL, 420);
+            case "Dinner":
+                return prefs.getInt(KEY_MEAL_DINNER_KCAL, 310);
+            default:
+                return prefs.getInt(KEY_MEAL_SNACKS_KCAL, 120);
         }
     }
 
@@ -191,7 +206,7 @@ public class PreferenceManager {
         } else {
             history = newEntry + "|" + history; // Newest first
         }
-        
+
         prefs.edit()
                 .putString(KEY_WEIGHT_HISTORY, history)
                 .putFloat(KEY_CURRENT_WEIGHT, weight)
@@ -216,34 +231,39 @@ public class PreferenceManager {
 
     public void deleteWeightEntry(int index) {
         String history = getWeightHistory();
-        if (history.isEmpty()) return;
+        if (history.isEmpty())
+            return;
 
         String[] entries = history.split("\\|");
-        if (index < 0 || index >= entries.length) return;
+        if (index < 0 || index >= entries.length)
+            return;
 
         StringBuilder sb = new StringBuilder();
         float lastWeight = 0;
         for (int i = 0; i < entries.length; i++) {
-            if (i == index) continue;
-            if (sb.length() > 0) sb.append("|");
+            if (i == index)
+                continue;
+            if (sb.length() > 0)
+                sb.append("|");
             sb.append(entries[i]);
-            
+
             // Track the "newest" weight to update currentWeight
             if (lastWeight == 0) {
                 String[] parts = entries[i].split(":");
-                if (parts.length == 2) lastWeight = Float.parseFloat(parts[1]);
+                if (parts.length == 2)
+                    lastWeight = Float.parseFloat(parts[1]);
             }
         }
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(KEY_WEIGHT_HISTORY, sb.toString());
         editor.putFloat(KEY_CURRENT_WEIGHT, lastWeight);
-        
+
         // If everything is deleted, reset start weight too
         if (sb.length() == 0) {
             editor.putFloat(KEY_START_WEIGHT, 0.0f);
         }
-        
+
         editor.apply();
     }
 
@@ -251,21 +271,16 @@ public class PreferenceManager {
         return prefs.getFloat(KEY_CURRENT_WEIGHT, 0.0f);
     }
 
-    public void saveUser(String name, String email, String password) {
+    public void saveUser(String name, String email) {
         prefs.edit()
                 .putString(KEY_USER_NAME, name)
                 .putString(KEY_USER_EMAIL, email)
-                .putString(KEY_USER_PASSWORD, password)
                 .putBoolean(KEY_IS_REGISTERED, true)
                 .apply();
     }
 
     public String getUserEmail() {
         return prefs.getString(KEY_USER_EMAIL, "");
-    }
-
-    public String getUserPassword() {
-        return prefs.getString(KEY_USER_PASSWORD, "");
     }
 
     public String getUserName() {
@@ -344,15 +359,16 @@ public class PreferenceManager {
 
     public boolean shouldResetMeals() {
         String lastDate = prefs.getString(KEY_MEAL_RESET_DATE, "");
-        String currentDate = new java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault()).format(new java.util.Date());
+        String currentDate = new java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault())
+                .format(new java.util.Date());
         if (!lastDate.equals(currentDate)) {
             prefs.edit()
-                .putString(KEY_MEAL_RESET_DATE, currentDate)
-                .putBoolean(KEY_BREAKFAST_DONE, false)
-                .putBoolean(KEY_LUNCH_DONE, false)
-                .putBoolean(KEY_DINNER_DONE, false)
-                .putBoolean(KEY_SNACKS_DONE, false)
-                .apply();
+                    .putString(KEY_MEAL_RESET_DATE, currentDate)
+                    .putBoolean(KEY_BREAKFAST_DONE, false)
+                    .putBoolean(KEY_LUNCH_DONE, false)
+                    .putBoolean(KEY_DINNER_DONE, false)
+                    .putBoolean(KEY_SNACKS_DONE, false)
+                    .apply();
             return true;
         }
         return false;
@@ -361,20 +377,32 @@ public class PreferenceManager {
     public void setMealDone(String type, boolean isDone) {
         String key;
         switch (type) {
-            case "Breakfast": key = KEY_BREAKFAST_DONE; break;
-            case "Lunch": key = KEY_LUNCH_DONE; break;
-            case "Dinner": key = KEY_DINNER_DONE; break;
-            default: key = KEY_SNACKS_DONE; break;
+            case "Breakfast":
+                key = KEY_BREAKFAST_DONE;
+                break;
+            case "Lunch":
+                key = KEY_LUNCH_DONE;
+                break;
+            case "Dinner":
+                key = KEY_DINNER_DONE;
+                break;
+            default:
+                key = KEY_SNACKS_DONE;
+                break;
         }
         prefs.edit().putBoolean(key, isDone).apply();
     }
 
     public boolean isMealDone(String type) {
         switch (type) {
-            case "Breakfast": return prefs.getBoolean(KEY_BREAKFAST_DONE, false);
-            case "Lunch": return prefs.getBoolean(KEY_LUNCH_DONE, false);
-            case "Dinner": return prefs.getBoolean(KEY_DINNER_DONE, false);
-            default: return prefs.getBoolean(KEY_SNACKS_DONE, false);
+            case "Breakfast":
+                return prefs.getBoolean(KEY_BREAKFAST_DONE, false);
+            case "Lunch":
+                return prefs.getBoolean(KEY_LUNCH_DONE, false);
+            case "Dinner":
+                return prefs.getBoolean(KEY_DINNER_DONE, false);
+            default:
+                return prefs.getBoolean(KEY_SNACKS_DONE, false);
         }
     }
 }

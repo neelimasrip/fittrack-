@@ -72,8 +72,8 @@ public class LoginActivity extends BaseActivity {
                             if (lastAccount != null) {
                                 firebaseAuthWithGoogle(lastAccount);
                             } else {
-                                String defaultName = "Google User";
-                                String defaultEmail = "user.google@fittrack.com";
+                                String defaultName = "Arjun Kumar";
+                                String defaultEmail = "arjun@fittrack.com";
                                 preferenceManager.saveProfile(defaultName, defaultEmail, "", 68.5f, 175f);
                                 preferenceManager.setLoggedIn(true);
                                 Toast.makeText(this, "Google Sign-In Successful", Toast.LENGTH_SHORT).show();

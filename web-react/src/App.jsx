@@ -18,7 +18,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('fit_logged_in') !== 'false');
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || 'Arjun Kumar');
   const [userEmail, setUserEmail] = useState(() => localStorage.getItem('userEmail') || 'arjun@fittrack.com');
-  const [userPassword, setUserPassword] = useState(() => localStorage.getItem('userPassword') || '123456');
+
   const [userWeight, setUserWeight] = useState(() => parseFloat(localStorage.getItem('currentWeight')) || 68.5);
   const [userHeight, setUserHeight] = useState(() => parseFloat(localStorage.getItem('userHeight')) || 175);
   const [goalWeight, setGoalWeight] = useState(() => parseFloat(localStorage.getItem('goalWeight')) || 65.0);
@@ -27,7 +27,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState('signin');
   const [inputName, setInputName] = useState('');
   const [inputEmail, setInputEmail] = useState(userEmail);
-  const [inputPassword, setInputPassword] = useState(userPassword);
+  const [inputPassword, setInputPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState('');
 
@@ -206,7 +206,7 @@ export default function App() {
 
       localStorage.setItem('userName', fetchedName);
       localStorage.setItem('userEmail', inputEmail);
-      localStorage.setItem('userPassword', inputPassword);
+
       localStorage.setItem('currentWeight', fetchedWeight);
       localStorage.setItem('userHeight', fetchedHeight);
       localStorage.setItem('profileImage', fetchedAvatar);
@@ -215,7 +215,7 @@ export default function App() {
 
       setUserName(fetchedName);
       setUserEmail(inputEmail);
-      setUserPassword(inputPassword);
+
       setUserWeight(fetchedWeight);
       setUserHeight(fetchedHeight);
       setUserAvatar(fetchedAvatar);
@@ -231,13 +231,13 @@ export default function App() {
 
       localStorage.setItem('userName', derivedName);
       localStorage.setItem('userEmail', inputEmail);
-      localStorage.setItem('userPassword', inputPassword);
+
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('fit_logged_in', 'true');
 
       setUserName(derivedName);
       setUserEmail(inputEmail);
-      setUserPassword(inputPassword);
+
       setIsLoggedIn(true);
       setCurrentView('dashboard');
     } finally {
