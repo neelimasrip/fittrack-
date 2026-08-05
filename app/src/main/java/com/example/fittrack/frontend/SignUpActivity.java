@@ -113,8 +113,10 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         binding.btnGoogleSignup.setOnClickListener(v -> {
-            Intent signInIntent = googleSignInClient.getSignInIntent();
-            googleSignInLauncher.launch(signInIntent);
+            googleSignInClient.signOut().addOnCompleteListener(this, task -> {
+                Intent signInIntent = googleSignInClient.getSignInIntent();
+                googleSignInLauncher.launch(signInIntent);
+            });
         });
 
         binding.tvLogin.setOnClickListener(v -> {

@@ -139,8 +139,10 @@ public class LoginActivity extends BaseActivity {
         });
 
         binding.btnGoogle.setOnClickListener(v -> {
-            Intent signInIntent = googleSignInClient.getSignInIntent();
-            googleSignInLauncher.launch(signInIntent);
+            googleSignInClient.signOut().addOnCompleteListener(this, task -> {
+                Intent signInIntent = googleSignInClient.getSignInIntent();
+                googleSignInLauncher.launch(signInIntent);
+            });
         });
     }
 
